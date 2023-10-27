@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.topbar {
+	--tw-drop-shadow: drop-shadow(0 0px 4px rgb(0 0 0 / 0.5));
+    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+
+	@apply
+	bg-blue-500 flex
+}
+
+.topbar h1 {
+	@apply
+	text-white font-sans text-2xl font-bold
+
+	pl-4
+	/* center vertically */
+	h-full flex flex-col justify-center
+}

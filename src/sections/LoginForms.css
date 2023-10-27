@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.loginFrame h1 {
+	@apply
+	text-3xl text-black font-sans font-bold
+	mb-2
+}
+
+.loginFrame h2 {
+	@apply
+	text-xl font-sans font-semibold
+}
+
+.loginForm input[type=text], input[type=password] {
+	@apply
+	mb-2 pl-1
+	border rounded-md
+	border-gray-500 bg-gray-50 shadow-inner
+	text-gray-900
+}
+
+.loginForm input[type=submit] {
+	@apply
+    px-2
+    font-semibold border
+    rounded shadow
+
+    bg-white text-gray-800
+    hover:bg-gray-100 border-gray-400;
+}
