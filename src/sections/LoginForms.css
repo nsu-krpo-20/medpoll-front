@@ -30,3 +30,8 @@
     bg-white text-gray-800
     hover:bg-gray-100 border-gray-400;
 }
+
+.loginFrame .formError {
+	@apply
+	text-red-800
+}

@@ -8,6 +8,7 @@ import AuthPage from 'src/routes/AuthPage'
 
 const root = document.getElementById('root')
 
+// https://docs.solidjs.com/guides/how-to-guides/routing-in-solid/solid-router
 render(() => (
 	<Router>
 		<Routes>
