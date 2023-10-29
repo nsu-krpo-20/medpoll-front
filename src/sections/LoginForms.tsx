@@ -85,46 +85,43 @@ function LoginForms() {
 	const navigate = useNavigate();
 	const { setUser } = useUserContext();
 
+	async function onLoginSubmit(e: Event) {
+		e.preventDefault();
+		if (loggingIn) return;
+
+		const error = validateForm(form);
+		if (error) {
+			setError(error);
+			return;
+		}
+
+		setError("");
+		loggingIn = true;
+
+		submit(form, "/api/v1/auth/login").then((out: AxiosResponse) => {
+			setToken(out.data.accessToken);
+			setUser(getUser()!);
+			// ^ Interfacing with the user context like this isn't the best IMO,
+			// maybe there's a better way?
+			navigate("/", { replace: true });
+		}).catch((e: any) => {
+			setError(translateErr(e.message));
+
+			var pw = document.getElementById("pwEntry") as HTMLInputElement;
+			if (pw) {
+				pw.value = "";
+				pw.focus();
+			}
+		}).finally(() => {
+			loggingIn = false;
+		})
+	}
+
 	return ( <>
 		<div class="h-full w-full flex justify-center items-center">
 			<div class="loginFrame h-fit flex flex-col justify-center items-center">
 				<h1> Вход в систему </h1>
-				<form class="loginForm flex flex-col" onSubmit={async (e: Event) => {
-					e.preventDefault();
-					if (loggingIn) return;
-
-					const error = validateForm(form);
-					if (error) {
-						setError(error);
-						return;
-					}
-
-					setError("");
-
-					loggingIn = true;
-					try {
-						var out = await submit(form, "/api/v1/auth/login");
-						setToken(out.data.accessToken);
-						setUser(getUser()!);
-						// ^ Interfacing with the user context like this isn't the best IMO,
-						// maybe there's a better way?
-
-						navigate("/", { replace: true });
-					} catch (e : any) {
-						console.log("error", e);
-						setError(translateErr(e.message));
-
-						var pw : HTMLInputElement | null =
-							document.getElementById("pwEntry") as HTMLInputElement;
-					
-						if (pw) {
-							pw.value = "";
-							pw.focus();
-						}
-					} finally {
-						loggingIn = false;
-					}
-				}}>
+				<form class="loginForm flex flex-col" onSubmit={onLoginSubmit}>
 					<input type="text" placeholder="Логин" onChange={updateField("login")} />
 					<input id="pwEntry" type="password" placeholder="Пароль" onChange={updateField("password")} />
 
