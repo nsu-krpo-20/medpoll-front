@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.greet h1 {
+	@apply
+	text-3xl text-black font-sans font-bold
+}
+
+.greet h2 {
+	@apply
+	text-xl font-sans font-semibold
+}
