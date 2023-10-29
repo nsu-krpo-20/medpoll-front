@@ -18,3 +18,18 @@
 	/* center vertically */
 	h-full flex flex-col justify-center
 }
+
+.userDisplay h1 {
+	@apply
+	text-white text-lg
+	font-sans font-semibold
+}
+
+.loginButton {
+	transition: background-color .05s, border-color .2s;
+
+	@apply
+	bg-transparent rounded-none
+	text-white font-semibold items-center
+	hover:bg-[rgb(255,255,255,0.3)]
+}
