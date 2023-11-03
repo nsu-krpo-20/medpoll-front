@@ -7,6 +7,8 @@ import Main from 'src/routes/Main'
 import AuthPage from 'src/routes/AuthPage'
 import { UserContext, getUser, UserContextArgs } from './libs/auth';
 import { createSignal } from 'solid-js';
+import PatientsPage from './routes/Patients';
+import CreatePatientPage from './routes/Patients/Create';
 
 const root = document.getElementById('root')
 
@@ -20,6 +22,8 @@ render(() => {
 			<Routes>
 				<Route path="/" component={Main} />
 				<Route path="/login" component={AuthPage} />
+				<Route path="/patients" component={PatientsPage} />
+				<Route path="/patients/create" component={CreatePatientPage} />
 			</Routes>
 		</UserContext.Provider>
 	</Router>)
