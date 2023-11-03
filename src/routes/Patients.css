@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.patientCardFrame {
+	filter: drop-shadow(1px 1px 3px rgb(0 0 0 / 0.3));
+
+	@apply
+	bg-white
+}
