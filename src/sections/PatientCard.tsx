@@ -53,23 +53,29 @@ function useCardForm() {
 	return { form, submit, updateField };
 };
 
-function LoginForms() {
-	const { form, updateField, submit } = useCardForm();
+interface PatientCardFieldsProps {
+	submit: any | null,
+	updateField: (val: string) => undefined
+}
 
+function PatientCardFields(props : PatientCardFieldsProps) {
 	return ( <>
 		<div class="h-full w-full flex justify-center items-center">
-			<div class="loginFrame h-fit flex flex-col justify-center items-center">
+			<div class="h-fit flex flex-col justify-center items-center">
 
 				<form class="loginForm flex flex-col">
-					<input type="text" placeholder="ФИО" onChange={updateField("name")} />
-					<input type="text" placeholder="Номер телефона" onChange={updateField("phoneNumber")} />
-					<input type="text" placeholder="Номер СНИЛС" onChange={updateField("snils")} />
+					<input type="text" placeholder="ФИО" onChange={props.updateField("name")} />
+					<input type="text" placeholder="Номер телефона" onChange={props.updateField("phoneNumber")} />
+					<input type="text" placeholder="Номер СНИЛС" onChange={props.updateField("snils")} />
 
-					<input type="submit" value="Создать" name="login" class="mx-4" />
+					{props.submit}
 				</form>
 			</div>
 		</div>
 	</> )
 }
 
-export default LoginForms;
+export {
+	PatientCardFields,
+	useCardForm,
+}

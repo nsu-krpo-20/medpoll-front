@@ -12,7 +12,7 @@ function Main() {
 			</div>
 
 			<div class="flex grow">
-				pagchomperz
+
 			</div>
 		</div>
 	</> )
