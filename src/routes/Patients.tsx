@@ -4,7 +4,9 @@ import './Patients.css'
 import { Add, Favorite, LocationOn, PlusOne, Restore } from "@suid/icons-material";
 import { Button, Modal, ListItemButton, Divider, Typography, Paper, Grow, TextField } from "@suid/material";
 import { useNavigate } from '@solidjs/router';
-import { PatientCardFields, useCardForm } from 'src/sections/PatientCard';
+import { useNewCardForm } from 'src/sections/PatientCard';
+import * as Cards from "src/libs/patientcard";
+import { AxiosResponse } from 'axios';
 
 /*
 const [tabs, setTabs] = createSignal([
@@ -34,28 +36,34 @@ function Tabs() {
 }
 */
 
-function NewPatientModal(props : {isOpen: boolean, onClose: any}) {
-	const { form, updateField, submit } = useCardForm();
+function NewPatientModal(props : {isOpen: boolean, closeModal: any}) {
+	const { form, updateField } = useNewCardForm();
+	const closeModal = props.closeModal;
 
-	const CardTextField = (props) => {
+	const CardTextField = (props : any) => {
 		return <TextField variant="outlined" sx={{mt:1, mb:1, h:1, w:"100%"}} size="small" {...props} />
 	}
 
 	const submitCard = (e: SubmitEvent) => {
 		e.preventDefault();
-		console.log("the big submit", e);
+
+		Cards.submitNew(form).then((resp) => {
+			closeModal();
+		}).catch((err) => {
+			console.error(err);
+		});
 	}
 
-	return <Modal open={props.isOpen} onClose={props.onClose}
+	return <Modal open={props.isOpen} onClose={props.closeModal}
 	class="w-full h-full flex grow justify-center items-center">
 		<Grow in={props.isOpen} timeout={300}>
 			<Paper class="p-8">
 				<Typography variant="h5" textAlign='center'> Новый пациент </Typography>
 				<div class="h-full w-full flex justify-center items-center">
 					<form class="flex flex-col min-w-[320px]" onSubmit={submitCard}>
-						<CardTextField label="ФИО" required />
-						<CardTextField label="Номер телефона" />
-						<CardTextField label="Номер СНИЛС" />
+						<CardTextField label="ФИО" required onChange={updateField("fullName")}/>
+						<CardTextField label="Номер телефона" onChange={updateField("phoneNumber")}/>
+						<CardTextField label="Номер СНИЛС" onChange={updateField("snils")}/>
 
 						{/*
 						<input type="text" placeholder="ФИО" onChange={updateField("name")} />
@@ -63,7 +71,7 @@ function NewPatientModal(props : {isOpen: boolean, onClose: any}) {
 						<input type="text" placeholder="" onChange={updateField("snils")} />
 						*/}
 						<div class="flex flex-row w-full items-stretch px-4 mt-4 gap-x-2">
-							<Button variant="outlined" color="error"> Отмена </Button>
+							<Button variant="outlined" color="error" onClick={closeModal}> Отмена </Button>
 							<Button variant="contained" color="success" class="flex-1" type="submit"> Создать </Button>
 						</div>
 					</form>
@@ -79,15 +87,10 @@ const patients = [
 ]
 
 export default function PatientsPage() {
-	const navigate = useNavigate();
 	const [isNewPatient, setIsNewPatient] = createSignal(false);
-	const handleClose = () => setIsNewPatient(false);
 
-	function clickNewPatient(e) {
-		console.log("Clicked new patient", e);
-		setIsNewPatient(true);
-		//navigate("/patients/create");
-	}
+	const closeNewPatient = () => setIsNewPatient(false);
+	const openNewPatient = () => setIsNewPatient(true);
 
 	return (
 		<div class="w-full h-screen flex flex-col grow">
@@ -99,7 +102,7 @@ export default function PatientsPage() {
 				<h2 class="py-4"> Список пациентов </h2>
 
 				<div class="pb-4">
-					<Button variant="contained" color="success" onClick={clickNewPatient}>
+					<Button variant="contained" color="success" onClick={openNewPatient}>
 						<Add /> Создать
 					</Button>
 				</div>
@@ -118,7 +121,7 @@ export default function PatientsPage() {
 					</For>
 				</div>
 
-				<NewPatientModal isOpen={isNewPatient()} onClose={handleClose}/>
+				<NewPatientModal isOpen={isNewPatient()} closeModal={closeNewPatient}/>
 			</div>
 		</div>
 	)
