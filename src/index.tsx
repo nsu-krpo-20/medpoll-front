@@ -5,6 +5,7 @@ import { Route, Router, Routes } from "@solidjs/router";
 import './index.css'
 import Main from 'src/routes/Main'
 import AuthPage from 'src/routes/AuthPage'
+import RegisterPage from 'src/routes/RegisterPage'
 import { UserContext, getUser, UserContextArgs } from './libs/auth';
 import { createSignal } from 'solid-js';
 
@@ -20,6 +21,7 @@ render(() => {
 			<Routes>
 				<Route path="/" component={Main} />
 				<Route path="/login" component={AuthPage} />
+				<Route path="/register" component={RegisterPage} />
 			</Routes>
 		</UserContext.Provider>
 	</Router>)
