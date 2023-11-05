@@ -3,6 +3,8 @@ import * as Constants from "src/consts";
 
 const client = axios.create({
 	baseURL: Constants.BASE_URL,
+	withCredentials: true,
+	
 });
 
 export {
