@@ -1,4 +1,5 @@
 import { Accessor, createContext, createSignal, useContext } from "solid-js"
+import { client } from "./api";
 
 interface User {
 	token: string | null,
@@ -22,6 +23,7 @@ function useUserContext() {
 
 function setToken(accessToken: string) {
 	localStorage.setItem("token_access", accessToken);
+	client.defaults.headers.common.Authorization = `Bearer ${accessToken}`
 }
 
 function getUser() : User | null {
@@ -32,6 +34,8 @@ function getUser() : User | null {
 		token: token,
 	}
 }
+
+client.defaults.headers.common.Authorization = `Bearer ${getUser()?.token}`
 
 export type {
 	User,
