@@ -5,7 +5,9 @@ import { Route, Router, Routes } from "@solidjs/router";
 import './index.css'
 import Main from 'src/routes/Main'
 import AuthPage from 'src/routes/AuthPage'
+import RegisterPage from 'src/routes/RegisterPage'
 import PatientsPage from './routes/Patients';
+
 import CreatePatientPage from './routes/Patients/Create';
 import { getExpireData, refreshToken, jwtToken } from './libs/jwt';
 import { createEffect } from 'solid-js';
@@ -45,6 +47,7 @@ render(() => {
 			<Route path="/login" component={AuthPage} />
 			<Route path="/patients" component={PatientsPage} />
 			<Route path="/patients/create" component={CreatePatientPage} />
+			<Route path="/register" component={RegisterPage} />
 		</Routes>
 	</Router>)
 }, root!)

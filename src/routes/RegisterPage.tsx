@@ -1,8 +1,8 @@
-import LoginForms from "src/sections/LoginForms"
+import RegisterForms from "src/sections/RegisterForms"
 import TopNav from "src/components/TopBar"
 import './AuthPage.css'
 
-export default function AuthPage() {
+export default function RegisterPage() {
 	return (
 		<div class="w-full h-screen flex flex-col grow">
 			<div class="w-full h-12">
@@ -10,7 +10,7 @@ export default function AuthPage() {
 			</div>
 
 			<div class="flex grow">
-				<LoginForms />
+				<RegisterForms />
 			</div>
 		</div>
 	)
