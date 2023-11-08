@@ -1,6 +1,4 @@
-import { createSignal } from 'solid-js'
 import TopNav from "src/components/TopBar"
-import { useUserContext } from 'src/libs/auth'
 import './Create.css'
 
 function Main() {
