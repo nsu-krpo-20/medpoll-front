@@ -1,12 +1,10 @@
-import { Accessor, createSignal, For } from 'solid-js'
-import TopNav from "src/components/TopBar"
-import './Patients.css'
-import { Add, Favorite, LocationOn, PlusOne, Restore } from "@suid/icons-material";
-import { Button, Modal, ListItemButton, Divider, Typography, Paper, Grow, TextField } from "@suid/material";
-import { useNavigate } from '@solidjs/router';
-import { useNewCardForm } from 'src/sections/PatientCard';
+import { Add } from "@suid/icons-material";
+import { Button, Divider, Grow, ListItemButton, Modal, Paper, TextField, Typography } from "@suid/material";
+import { createSignal, For } from 'solid-js';
+import TopNav from "src/components/TopBar";
 import * as Cards from "src/libs/patientcard";
-import { AxiosResponse } from 'axios';
+import { useNewCardForm } from 'src/sections/PatientCard';
+import './Patients.css';
 
 /*
 const [tabs, setTabs] = createSignal([

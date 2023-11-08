@@ -5,7 +5,7 @@ import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
 import { client } from "src/libs/api";
 import { AxiosResponse } from 'axios';
-import { getUser, setToken, useUserContext } from 'src/libs/auth';
+import { setToken } from 'src/libs/jwt';
 
 type LoginFormFields = {
 	login?: string;
@@ -20,12 +20,6 @@ function translateErr(err: any) {
 }
 
 async function submit(form: LoginFormFields, endpoint: string) {
-	const data = {
-		login: form.login,
-		password: form.password,
-		rememberme: form.rememberme
-	};
-
 	return new Promise<AxiosResponse>((res, rej) => {
 		client.post(endpoint, {
 			login: form.login,
@@ -83,7 +77,6 @@ function LoginForms() {
 	const [ error, setError ] = createSignal("");
 	var loggingIn = false;
 	const navigate = useNavigate();
-	const { setUser } = useUserContext();
 
 	async function onLoginSubmit(e: Event) {
 		e.preventDefault();
@@ -100,7 +93,6 @@ function LoginForms() {
 
 		submit(form, "/api/v1/auth/login").then((out: AxiosResponse) => {
 			setToken(out.data.accessToken);
-			setUser(getUser()!);
 			// ^ Interfacing with the user context like this isn't the best IMO,
 			// maybe there's a better way?
 			navigate("/", { replace: true });

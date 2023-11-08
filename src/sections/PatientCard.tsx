@@ -1,12 +1,6 @@
-import { createSignal } from 'solid-js'
-import { createStore } from 'solid-js/store'
-import './LoginForms.css'
-import * as Constants from "src/consts"
-import { useNavigate } from '@solidjs/router';
-import { client } from "src/libs/api";
-import { AxiosResponse } from 'axios';
-import { getUser, setToken, useUserContext } from 'src/libs/auth';
-import { NewCardFields, PatientCard } from 'src/libs/patientcard';
+import { createStore } from 'solid-js/store';
+import { NewCardFields } from 'src/libs/patientcard';
+import './LoginForms.css';
 
 function useNewCardForm() {
 	const [form, setForm] = createStore<NewCardFields>({
@@ -28,4 +22,4 @@ function useNewCardForm() {
 
 export {
 	useNewCardForm,
-}
+};
