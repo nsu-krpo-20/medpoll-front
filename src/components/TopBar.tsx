@@ -1,19 +1,34 @@
-import { useNavigate } from '@solidjs/router';
+import { Navigate, useNavigate } from '@solidjs/router';
 import { createSignal, For } from 'solid-js'
-import { useUserContext } from 'src/libs/auth';
+import { logout, user } from 'src/libs/user';
 import { Avatar, IconButton, Menu, MenuItem, Divider, Typography } from "@suid/material";
 import Logout from "@suid/icons-material/Logout";
 import './TopBar.css'
-
-const userActions = [
-	{name: "Выйти", icon: <Logout fontSize="small" class="mr-1"/>},
-]
+import { Person } from '@suid/icons-material';
 
 function UserDisplay() {
-	const { user } = useUserContext();
 	const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
+	const navigate = useNavigate();
 	const open = () => Boolean(anchorEl());
 	const handleClose = () => setAnchorEl(null);
+
+	const userActions = [
+		{
+			name: "Пациенты",
+			icon: <Person fontSize="small" class="mr-1"/>,
+			props: { sx: {px: 1} },
+			onClick: () => {
+				return navigate("/patients")
+			}
+		}, {
+			name: "Выход",
+			icon: <Logout fontSize="small" class="mr-1"/>,
+			props: { sx: {px: 1} },
+			onClick: () => {
+				logout();
+			}
+		},
+	]
 
 	return (<>
 		<IconButton
@@ -64,7 +79,7 @@ function UserDisplay() {
 		<Typography variant="body1" sx={{pl: 1, pr:2}}> Имя Именович </Typography>
 		<Divider />
 		<For each={userActions}>
-			{(itm, i) => <MenuItem>
+			{(itm, i) => <MenuItem onClick={itm.onClick} {...(itm.props ? itm.props : {})}>
 				{itm.icon} {itm.name}
 			</MenuItem>}
 		</For>
@@ -85,14 +100,12 @@ function LoginButton() {
 }
 
 function TopBar() {
-	const { user } = useUserContext();
-
-  return ( <>
-      <header class="topbar h-full">
+	return ( <>
+		<header class="topbar h-full">
 		<h1> MedPoll </h1>
 		{ user() ? <UserDisplay /> : <LoginButton /> }
-	  </header>
-    </> )
+		</header>
+	</> )
 }
 
 export default TopBar;
