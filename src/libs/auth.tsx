@@ -16,17 +16,27 @@ const gahh_typescript : UserContextArgs = {
 	setUser: (u: User) => {},
 }
 
-// Call to check that the token is still valid
-function checkToken(jwt: string | void | null) {
+type MaybeJWT = string | null;
+type MaybeJWTOrEmpty = MaybeJWT | void;
+
+export function getExpireData(jwt: MaybeJWTOrEmpty) : [null] | [expiresIn: number, expiresTimestamp: number] {
 	jwt = jwt || getUncheckedToken();
-	if (!jwt) return false;
+	if (!jwt) return [null];
 
 	var jwtData = jwtDecode(jwt);
+	if (!jwtData.exp) {
+		return [null];
+	}
+
 	var now = Math.floor(Date.now() / 1000);
+	return [jwtData.exp - now, jwtData.exp];
+}
 
-	console.log("access token:", jwtData.exp! - now, "seconds till expiry");
+// Call to check that the token is still valid
+function checkToken(jwt: MaybeJWTOrEmpty) {
+	const [expiresIn, _] = getExpireData(jwt);
 
-	if (jwtData.exp && jwtData.exp - now < 0) {
+	if (!expiresIn || expiresIn < 0) {
 		return false;
 	}
 
@@ -43,7 +53,7 @@ function clearToken() {
 	client.defaults.headers.common.Authorization = null;
 }
 
-function getUncheckedToken() : string | null {
+function getUncheckedToken() : MaybeJWT {
 	return localStorage.getItem("token_access");
 }
 
@@ -56,7 +66,7 @@ export function setToken(jwt: string) {
 	updateToken(jwt);
 }
 
-export function getToken() : string | null {
+export function getToken() : MaybeJWT {
 	var token = getUncheckedToken();
 
 	if (!checkToken(token)) {
@@ -74,6 +84,46 @@ export function getUser() : User | null {
 	return {
 		token: token,
 	}
+}
+
+/* Refresh the JWT token. Syncs the refresh with other tabs,
+   i.e. requesting multiple refreshes will only run one and discard the others.
+   In that case, the discarded requests' promise will be rejected with `false` */
+export function refreshToken() : Promise<string> {
+	return new Promise((resolve, reject) => {
+		window.navigator.locks.request("refresh_token", {
+			ifAvailable: true,
+		}, async (lock) => {
+			// Failed to acquire lock due to a refresh already running; don't refresh
+			if (lock == null) reject(false);
+
+			try {
+				var resp = await client.post("/api/v1/auth/refresh");
+
+				setToken(resp.data.accessToken);
+				resolve(getToken()!);
+			} catch(err) {
+				console.error(err);
+				reject(err);
+			}
+		})
+	});
+}
+
+export function refreshTokenIfExpires(expires_grace : number | void) : Promise<string> | false {
+	expires_grace = expires_grace || 60;
+
+	const token = getUncheckedToken();
+	if (!token) {
+		return refreshToken();
+	}
+
+	const [expiresIn] = getExpireData(token);
+	if (!expiresIn || expiresIn < expires_grace) {
+		return refreshToken();
+	}
+
+	return false;
 }
 
 export const UserContext = createContext(gahh_typescript);
