@@ -5,8 +5,7 @@ import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
 import { client } from "src/libs/api";
 import { AxiosResponse } from 'axios';
-
-import { getUser, setToken, useUserContext } from 'src/libs/auth';
+import { setToken } from 'src/libs/jwt';
 
 type RegisterFormFields = {
 	login?: string;
@@ -24,7 +23,6 @@ async function submit(form: RegisterFormFields, endpoint: string) {
 			login: form.login,
 			password: form.password,
 		}).then((resp: AxiosResponse) => {
-			console.log("response:", resp);
 			res(resp);
 		}).catch((why: any) => {
 			rej(why);
@@ -64,7 +62,6 @@ function RegisterForms() {
 	const [ error, setError ] = createSignal("");
 	var sendingRegister = false;
 	const navigate = useNavigate();
-	const { setUser } = useUserContext();
 
 	async function onRegisterSubmit(e: Event) {
 		e.preventDefault();
@@ -81,9 +78,6 @@ function RegisterForms() {
 
 		submit(form, "/api/v1/auth/register").then((out: AxiosResponse) => {
 			setToken(out.data.accessToken);
-			setUser(getUser()!);
-			// ^ Interfacing with the user context like this isn't the best IMO,
-			// maybe there's a better way?
 			navigate("/", { replace: true });
 		}).catch((e: any) => {
 			setError(translateErr(e.message));
