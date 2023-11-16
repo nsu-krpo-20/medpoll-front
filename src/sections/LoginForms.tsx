@@ -26,7 +26,6 @@ async function submit(form: LoginFormFields, endpoint: string) {
 			password: form.password,
 			email: form.email,
 		}).then((resp: AxiosResponse) => {
-			console.log("response:", resp);
 			res(resp);
 		}).catch((why: any) => {
 			rej(why);
