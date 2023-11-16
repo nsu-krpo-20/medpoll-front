@@ -26,7 +26,14 @@ render(() => {
 		/* This hook will handle refreshing the token
 		   when it's about to expire automatically */
 		const token = jwtToken();
-		if (!token) return; // no token => no refresh
+		if (!token) {
+			// The `refreshToken` cookie is HTTPOnly, so we can't know if it expired
+			// so we use the EAFP philosophy here and just try to refresh the dang thing blindly
+
+			refreshToken()
+				.catch(() => { /* oh well */ });
+			return;
+		}
 
 		const [expiresIn] = getExpireData(token);
 		if (expiresIn) {
