@@ -6,10 +6,43 @@
 	filter: drop-shadow(1px 1px 3px rgb(0 0 0 / 0.3));
 
 	@apply
-	bg-white
+	bg-white grow-0
 }
 
 .absoluteCenter {
 	@apply
 	absolute m-auto left-0 right-0 top-0
+}
+
+.cardListGridContainer {
+	@apply
+	flex grow flex-col
+	bg-slate-50 shadow-inner
+	px-4
+	py-2 mb-2
+}
+
+.cardListGrid {
+	@apply
+	grid gap-4
+
+	grid-cols-2
+	md:grid-cols-3
+	lg:grid-cols-4
+	xl:grid-cols-5
+}
+
+.patientCardDetails span {
+	@apply
+	leading-snug
+}
+
+.cardPageBtn {
+	@apply
+	px-4 /* Solid's default padding is 0.6, 1.2rem (almost px-2, px-5) */
+	py-1.5
+	border-blue-300
+	disabled:opacity-30
+	disabled:border-transparent
+	aria-[current]:border-blue-600
 }
