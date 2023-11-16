@@ -8,7 +8,9 @@ interface NewCardFields {
 }
 
 interface PatientCard extends NewCardFields {
-	prescriptions: object,
+	id: number,
+	description: string | null,
+	prescriptions: object | null,
 }
 
 interface Prescription {
@@ -44,8 +46,44 @@ async function submitNew(data : NewCardFields) {
 	})
 }
 
+async function fetchMultiple(offset?: number, count?: number, searchQuery?: string)
+	: Promise<PatientCard[]> {
+	offset = offset || 0;
+	count = count || 25;
+	searchQuery = searchQuery || "";
+
+	return new Promise<PatientCard[]>((res, rej) => {
+		client.get("/api/v1/cards/fetch", {
+			params: {
+				offset: offset,
+				count: count,
+				fullNameQuery: searchQuery,
+			}
+		}).then((resp: AxiosResponse) => {
+			var cardArr : PatientCard[] = resp.data;
+			res(cardArr);
+		}).catch((why: any) => {
+			rej(why);
+		})
+	})
+}
+
+async function fetchCount() : Promise<number> {
+	return new Promise<number>((res, rej) => {
+		client.get("/api/v1/cards/count")
+		.then((resp: AxiosResponse) => {
+			res(resp.data);
+		}).catch((why: any) => {
+			rej(why);
+		})
+	})
+}
+
+
 export {
-	submitNew
+	submitNew,
+	fetchMultiple,
+	fetchCount
 }
 
 export type {
