@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { client } from "./api";
+import { authedClient } from "./api";
 
 interface NewCardFields {
 	fullName: string,
@@ -8,7 +8,9 @@ interface NewCardFields {
 }
 
 interface PatientCard extends NewCardFields {
-	prescriptions: object,
+	id: number,
+	description: string | null,
+	prescriptions: object | null,
 }
 
 interface Prescription {
@@ -32,7 +34,7 @@ interface PrescriptionMetric {
 
 async function submitNew(data : NewCardFields) {
 	return new Promise<AxiosResponse>((res, rej) => {
-		client.post("/api/v1/cards", {
+		authedClient.post("/api/v1/cards", {
 			fullName: data.fullName,
 			phoneNumber: data.phoneNumber,
 			snils: data.snils,
@@ -44,8 +46,44 @@ async function submitNew(data : NewCardFields) {
 	})
 }
 
+async function fetchMultiple(offset?: number, count?: number, searchQuery?: string)
+	: Promise<PatientCard[]> {
+	offset = offset || 0;
+	count = count || 25;
+	searchQuery = searchQuery || "";
+
+	return new Promise<PatientCard[]>((res, rej) => {
+		authedClient.get("/api/v1/cards/fetch", {
+			params: {
+				offset: offset,
+				count: count,
+				fullNameQuery: searchQuery,
+			}
+		}).then((resp: AxiosResponse) => {
+			var cardArr : PatientCard[] = resp.data;
+			res(cardArr);
+		}).catch((why: any) => {
+			rej(why);
+		})
+	})
+}
+
+async function fetchCount() : Promise<number> {
+	return new Promise<number>((res, rej) => {
+		authedClient.get("/api/v1/cards/count")
+		.then((resp: AxiosResponse) => {
+			res(resp.data);
+		}).catch((why: any) => {
+			rej(why);
+		})
+	})
+}
+
+
 export {
-	submitNew
+	submitNew,
+	fetchMultiple,
+	fetchCount
 }
 
 export type {

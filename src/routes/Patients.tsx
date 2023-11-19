@@ -1,10 +1,11 @@
 import { Add } from "@suid/icons-material";
 import { Button, Divider, Grow, ListItemButton, Modal, Paper, TextField, Typography } from "@suid/material";
-import { createSignal, For } from 'solid-js';
+import { createEffect, createSignal, For } from 'solid-js';
 import TopNav from "src/components/TopBar";
 import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
+import { createPagination } from "@solid-primitives/pagination";
 
 /*
 const [tabs, setTabs] = createSignal([
@@ -34,7 +35,7 @@ function Tabs() {
 }
 */
 
-function NewPatientModal(props : {isOpen: boolean, closeModal: any}) {
+function NewPatientModal(props : {isOpen: boolean, closeModal: any, onSubmit: any}) {
 	const { form, updateField } = useNewCardForm();
 	const closeModal = props.closeModal;
 
@@ -47,6 +48,7 @@ function NewPatientModal(props : {isOpen: boolean, closeModal: any}) {
 
 		Cards.submitNew(form).then((resp) => {
 			closeModal();
+			props.onSubmit();
 		}).catch((err) => {
 			console.error(err);
 		});
@@ -79,47 +81,95 @@ function NewPatientModal(props : {isOpen: boolean, closeModal: any}) {
 	</Modal>
 }
 
-const patients = [
-	{ name: "Иван Иванов Захрапин", phoneNumber: "+79990123456" },
-	{ name: "Алексей Каменщик Долбня" }
-]
-
 export default function PatientsPage() {
 	const [isNewPatient, setIsNewPatient] = createSignal(false);
+	const [cards, setCards] = createSignal([] as Cards.PatientCard[]);
+	const [cardCount, setCardCount] = createSignal(0);
+
+	/* <TotallyNotAHack> */
+	var currentOpts = {
+		pages: 0,
+		showLast: false,
+		showFirst: false,
+	};
+
+	const [pageOpts, setPageOpts] = createSignal(currentOpts);
+
+	createEffect(() => {
+		currentOpts.pages = Math.ceil(cardCount() / cardsPerPage)
+		setPageOpts({...currentOpts})
+	})
+
+	const [pgProps, page, setPage] = createPagination(pageOpts);
+	/* </TotallyNotAHack> */
 
 	const closeNewPatient = () => setIsNewPatient(false);
 	const openNewPatient = () => setIsNewPatient(true);
 
+	const cardsPerPage = 50;
+
+	const fetchCards = (page?: number) => {
+		return Cards.fetchMultiple((page ? (page - 1) : 0) * cardsPerPage, cardsPerPage).then((resp) => {
+			return resp;
+		});
+	}
+
+	Cards.fetchCount().then(setCardCount);
+
+	const fetchCurrentPage = () => {
+		fetchCards(page())
+			.then((data) => {
+				setCards(data);
+			});
+	}
+
+	const onNewCard = () => {
+		fetchCurrentPage();
+	}
+
+	createEffect(fetchCurrentPage);
+
 	return (
-		<div class="w-full h-screen flex flex-col grow">
+		<div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 			<div class="w-full h-12">
 				<TopNav />
 			</div>
 
-			<div class="px-4">
+			<div class="px-4 lg:px-8 xl:px-16 flex flex-col h-full">
 				<h2 class="py-4"> Список пациентов </h2>
 
-				<div class="pb-4">
+				<div class="pb-2">
 					<Button variant="contained" color="success" onClick={openNewPatient}>
 						<Add /> Создать
 					</Button>
 				</div>
 
-				<div class="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-					<For each={patients}>
-						{(pat, i) =>
-						<div class="patientCardFrame flex flex-col px-3 py-3">
-							<div class="flex flex-col grow">
-								<span class="truncate whitespace-nowrap"> {pat.name} </span>
-								<span> {pat.phoneNumber} </span>
-							</div>
-							<Divider/>
-							<ListItemButton sx={{flexGrow: 0}}> Перейти </ListItemButton>
-						</div>}
+				<div class="flex flex-row justify-center gap-x-2 pb-2">
+					<For each={pgProps()}>
+						{ (props) =>
+						<button class="cardPageBtn" {...props} />
+					}
 					</For>
 				</div>
+			
+				<div class="cardListGridContainer">
+					<div class="cardListGrid">
+						<For each={cards()}>
+							{(pat, i) =>
+							<div class="patientCardFrame flex flex-col">
+								<div class="patientCardDetails flex flex-col px-2 py-1 grow">
+									<span class="truncate whitespace-nowrap font-bold"> {pat.fullName} </span>
+									{pat.phoneNumber ? <span> {pat.phoneNumber} </span>
+									    : <span class="text-neutral-300"> - </span> }
+								</div>
+								<Divider/>
+								<ListItemButton sx={{flexGrow: 0}}> Перейти </ListItemButton>
+							</div>}
+						</For>
+					</div>
+				</div>
 
-				<NewPatientModal isOpen={isNewPatient()} closeModal={closeNewPatient}/>
+				<NewPatientModal isOpen={isNewPatient()} closeModal={closeNewPatient} onSubmit={onNewCard}/>
 			</div>
 		</div>
 	)
