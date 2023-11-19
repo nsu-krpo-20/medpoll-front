@@ -3,7 +3,7 @@ import { createStore } from 'solid-js/store'
 import './LoginForms.css'
 import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
-import { client } from "src/libs/api";
+import { authedClient } from "src/libs/api";
 import { AxiosResponse } from 'axios';
 import { setToken } from 'src/libs/jwt';
 
@@ -21,7 +21,7 @@ function translateErr(err: any) {
 
 async function submit(form: LoginFormFields, endpoint: string) {
 	return new Promise<AxiosResponse>((res, rej) => {
-		client.post(endpoint, {
+		authedClient.post(endpoint, {
 			login: form.login,
 			password: form.password,
 			email: form.email,

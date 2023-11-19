@@ -1,11 +1,11 @@
 import { Add } from "@suid/icons-material";
 import { Button, Divider, Grow, ListItemButton, Modal, Paper, TextField, Typography } from "@suid/material";
-import { createEffect, createResource, createSignal, For, ResourceReturn, Show } from 'solid-js';
+import { createEffect, createSignal, For } from 'solid-js';
 import TopNav from "src/components/TopBar";
 import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
-import { createInfiniteScroll, createPagination } from "@solid-primitives/pagination";
+import { createPagination } from "@solid-primitives/pagination";
 
 /*
 const [tabs, setTabs] = createSignal([

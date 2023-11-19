@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { client } from "./api";
+import { authedClient } from "./api";
 
 interface NewCardFields {
 	fullName: string,
@@ -34,7 +34,7 @@ interface PrescriptionMetric {
 
 async function submitNew(data : NewCardFields) {
 	return new Promise<AxiosResponse>((res, rej) => {
-		client.post("/api/v1/cards", {
+		authedClient.post("/api/v1/cards", {
 			fullName: data.fullName,
 			phoneNumber: data.phoneNumber,
 			snils: data.snils,
@@ -53,7 +53,7 @@ async function fetchMultiple(offset?: number, count?: number, searchQuery?: stri
 	searchQuery = searchQuery || "";
 
 	return new Promise<PatientCard[]>((res, rej) => {
-		client.get("/api/v1/cards/fetch", {
+		authedClient.get("/api/v1/cards/fetch", {
 			params: {
 				offset: offset,
 				count: count,
@@ -70,7 +70,7 @@ async function fetchMultiple(offset?: number, count?: number, searchQuery?: stri
 
 async function fetchCount() : Promise<number> {
 	return new Promise<number>((res, rej) => {
-		client.get("/api/v1/cards/count")
+		authedClient.get("/api/v1/cards/count")
 		.then((resp: AxiosResponse) => {
 			res(resp.data);
 		}).catch((why: any) => {
