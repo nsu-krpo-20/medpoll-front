@@ -1,6 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { createSignal } from "solid-js";
-import { client } from "./api";
+import { authedClient, unauthedClient } from "./api";
 
 const STORAGE_TOKEN_KEY = "token_access"
 
@@ -38,12 +38,16 @@ export function isTokenExpired(jwt: JWT) : boolean {
 
 function updateToken(newJwt: MaybeJWT) {
 	if (newJwt) {
-		client.defaults.headers.common.Authorization = `Bearer ${newJwt}`;
+		authedClient.defaults.headers.common.Authorization = `Bearer ${newJwt}`;
 	} else {
-		client.defaults.headers.common.Authorization = null;
+		authedClient.defaults.headers.common.Authorization = null;
 	}
 
 	setJwtToken(newJwt);
+
+	const event = new Event("jwtSet");
+	console.log("Dispatching jwtSet", newJwt)
+	window.dispatchEvent(event);
 }
 
 export function clearToken() {
@@ -88,7 +92,7 @@ export function refreshToken() : Promise<JWT> {
 			if (lock == null) reject(false);
 
 			try {
-				var resp = await client.post("/api/v1/auth/refresh");
+				var resp = await unauthedClient.post("/api/v1/auth/refresh");
 
 				setToken(resp.data.accessToken);
 				resolve(getToken()!);
