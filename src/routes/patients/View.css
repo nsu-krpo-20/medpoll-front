@@ -1,0 +1,35 @@
+
+.patientName {
+	@apply
+	font-semibold
+}
+
+h1.missing {
+	@apply
+	text-neutral-500 font-normal
+}
+
+.leftHeader {
+	@apply
+	pb-2
+	font-semibold text-2xl
+}
+
+.propDiv {
+	@apply
+	my-1.5
+}
+.propDisplayName {
+	@apply
+	font-semibold text-lg
+}
+
+.propDisplayValue {
+	@apply
+	text-lg
+}
+
+.propDisplayName.loading, .propDisplayValue.loading {
+	@apply
+	text-neutral-500
+}
