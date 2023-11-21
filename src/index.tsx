@@ -8,12 +8,23 @@ import AuthPage from 'src/routes/AuthPage'
 import RegisterPage from 'src/routes/RegisterPage'
 import PatientsPage from './routes/Patients';
 
-import CreatePatientPage from './routes/Patients/Create';
 import { getExpireData, refreshToken, jwtToken } from './libs/jwt';
 import { createEffect } from 'solid-js';
 import * as Constants from "src/consts"
+import { ViewPatientPage } from './routes/patients/View';
+import { createTheme, ThemeProvider } from '@suid/material';
 
 const root = document.getElementById('root')
+
+const theme = createTheme({
+	components: {
+	  MuiButtonBase: {
+		defaultProps: {
+		  disableRipple: true,
+		},
+	  },
+	},
+});
 
 // https://docs.solidjs.com/guides/how-to-guides/routing-in-solid/solid-router
 render(() => {
@@ -49,12 +60,14 @@ render(() => {
 	onTokenChanged();
 
 	return (<Router>
+		<ThemeProvider theme={theme}>
 		<Routes>
 			<Route path="/" component={Main} />
 			<Route path="/login" component={AuthPage} />
 			<Route path="/patients" component={PatientsPage} />
-			<Route path="/patients/create" component={CreatePatientPage} />
+			<Route path="/patients/view/:id" component={ViewPatientPage} />
 			<Route path="/register" component={RegisterPage} />
 		</Routes>
+		</ThemeProvider>
 	</Router>)
 }, root!)

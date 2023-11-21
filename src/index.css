@@ -19,6 +19,14 @@
   -webkit-text-size-adjust: 100%;
 }
 
+.pageContent {
+	@apply
+	h-full
+	px-4 lg:px-8 xl:px-16
+	pt-4
+	flex flex-col
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -57,7 +65,7 @@ button:focus-visible {
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
-    background-color: #ffffff;
+    background-color: rgb(243, 246, 249);
   }
 
   button {
