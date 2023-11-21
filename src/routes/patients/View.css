@@ -15,10 +15,6 @@ h1.missing {
 	font-semibold text-2xl
 }
 
-.propDiv {
-	@apply
-	my-1.5
-}
 .propDisplayName {
 	@apply
 	font-semibold text-lg

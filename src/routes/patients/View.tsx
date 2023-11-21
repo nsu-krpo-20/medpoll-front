@@ -1,5 +1,6 @@
 import { useLocation, useParams } from "@solidjs/router";
-import { Paper } from "@suid/material";
+import { Book, Edit, Info, QrCode } from "@suid/icons-material";
+import { BottomNavigation, BottomNavigationAction, Button, Paper } from "@suid/material";
 import { AxiosResponse } from "axios";
 import { Accessor, createEffect, createResource, createSignal, For, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
@@ -7,6 +8,8 @@ import TopNav from "src/components/TopBar";
 import { authedClient } from "src/libs/api";
 import * as Cards from "src/libs/patientcard";
 import './View.css'
+import { ViewInfo } from "./ViewComponents/leftpanel";
+import { ViewPairing } from "./ViewComponents/rightpanel";
 
 async function fetchCard(id : number) : Promise<AxiosResponse<Cards.PatientCard, any>> {
 	// Invalid ID passed in route; don't try fetching anything
@@ -15,40 +18,48 @@ async function fetchCard(id : number) : Promise<AxiosResponse<Cards.PatientCard,
 	return authedClient.get(`/api/v1/cards/${id}`);
 }
 
-function leftViewInfo(props) : JSX.Element {
-	const card : Accessor<Cards.PatientCard | null> = props.card;
-	const loadingCl = props.loadingCl;
+const rightStateToComponent = {
+	info: null,
+	qr: ViewPairing,
+}
 
+const leftStateToComponent = {
+	info: ViewInfo,
+}
 
-	const propToDisplay = [
-		{key: "fullName", name: "ФИО"},
-		{key: "snils", name: "СНИЛС"},
-		{key: "phoneNumber", name: "Номер телефона"},
+function RightPanel(props) : JSX.Element {
+	const tabs = [
+		{label: "Информация", icon: <Info />, state: "info"},
+		{label: "Назначения", icon: <Book />, state: "prescriptions"},
+		{label: "Сопряжение", icon: <QrCode />, state: "qr"},
+		// If you're adding more, make sure you update the min-w of the right-side panel too
 	]
 
-	const placeholder = () => (loadingCl().loading ? "загрузка..." : "-");
+	const [rightState, setRightState] = createSignal(tabs[0].state);
 
-	return <div class="flex flex-col">
-		<h2 class="leftHeader">Основные данные</h2>
+	const select = (ev, selValue: string) => {
+		console.log("selected:", selValue);
+		setRightState(selValue);
+	}
 
-		<For each={propToDisplay}>
-			{(disp, i) =>
-				<div class="propDiv">
-					<span classList={{propDisplayName: true, ...loadingCl()}}>
-						{disp.name}: 
-					</span>
-					<span classList={{propDisplayValue: true, ...loadingCl()}}>
-						{card()?.[disp.key] || placeholder()}
-					</span>
-				</div>
-			}
-		</For>
-	</div>
+	return <>
+		<BottomNavigation showLabels onChange={select} value={rightState()}>
+			<For each={tabs}>
+				{(tabData, idx) =>
+					<BottomNavigationAction {...tabData}
+					selected={rightState() == tabData.state}
+					value={tabData.state}
+					/>
+				}
+			</For>
+		</BottomNavigation>
+
+		<Dynamic component={rightStateToComponent[rightState()]}
+				card={props.card}
+				loadingCl={props.loadingCl} />
+	</>
 }
 
-const stateToComponent = {
-	info: leftViewInfo,
-}
 
 export function ViewPatientPage() {
 	const params = useParams(); // 👈 Get the dynamic route parameters
@@ -61,7 +72,7 @@ export function ViewPatientPage() {
 	var loading = true;
 	var missing = () => !card();
 	const [fetchedCard] = createResource(id, fetchCard);
-	const [leftState, setLeftState] = createSignal("info")
+	const [leftState, setLeftState] = createSignal("info");
 
 	createEffect(() => {
 		if (fetchedCard()) {
@@ -69,6 +80,10 @@ export function ViewPatientPage() {
 			loading = false;
 		}
 	})
+
+	const onSelectRightTab = (tab: JSX.Element) => {
+
+	}
 
 	const loadingClasslist = () => ({loading: loading, missing: missing()});
 
@@ -82,14 +97,14 @@ export function ViewPatientPage() {
 				{card() ? card().fullName : "Загрузка..."}
 			</h1>
 			
-			<div class="flex flex-row grow justify-around gap-x-4 py-8">
-				<Paper class="grow-[3] px-4 py-4">
+			<div class="flex flex-row grow justify-around gap-x-2 lg:gap-x-4 py-8">
+				<Paper class="basis-[66%] px-4 py-4 min-w-[500px]">
 					{ /* TS shut up pls */ }
-					<Dynamic component={stateToComponent[leftState()]} card={card} loadingCl={loadingClasslist} />
+					<Dynamic component={leftStateToComponent[leftState()]} card={card} loadingCl={loadingClasslist} />
 				</Paper>
 
-				<Paper  class="grow-[2]">
-					
+				<Paper class="basis-[34%] min-w-[300px]">
+					<RightPanel card={card} loadingCl={loadingClasslist} onSelect={onSelectRightTab} />
 				</Paper>
 			</div>
 		</div>
