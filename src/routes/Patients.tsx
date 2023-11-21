@@ -6,6 +6,7 @@ import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
 import { createPagination } from "@solid-primitives/pagination";
+import { Navigate, useNavigate } from "@solidjs/router";
 
 /*
 const [tabs, setTabs] = createSignal([
@@ -105,6 +106,7 @@ export default function PatientsPage() {
 
 	const closeNewPatient = () => setIsNewPatient(false);
 	const openNewPatient = () => setIsNewPatient(true);
+	const navigate = useNavigate();
 
 	const cardsPerPage = 50;
 
@@ -127,6 +129,12 @@ export default function PatientsPage() {
 		fetchCurrentPage();
 	}
 
+	const gotoCard = (card : Cards.PatientCard) => {
+		return navigate(`/patients/view/${card.id}`, {
+			state: card
+		})
+	}
+
 	createEffect(fetchCurrentPage);
 
 	return (
@@ -135,10 +143,10 @@ export default function PatientsPage() {
 				<TopNav />
 			</div>
 
-			<div class="px-4 lg:px-8 xl:px-16 flex flex-col h-full">
-				<h2 class="py-4"> Список пациентов </h2>
+			<div class="pageContent">
+				<h2 class="pb-4"> Список пациентов </h2>
 
-				<div class="pb-2">
+				<div class="pb-4">
 					<Button variant="contained" color="success" onClick={openNewPatient}>
 						<Add /> Создать
 					</Button>
@@ -163,7 +171,9 @@ export default function PatientsPage() {
 									    : <span class="text-neutral-300"> - </span> }
 								</div>
 								<Divider/>
-								<ListItemButton sx={{flexGrow: 0}}> Перейти </ListItemButton>
+								<ListItemButton sx={{flexGrow: 0}} onClick={() => gotoCard(pat)}>
+									Перейти
+								</ListItemButton>
 							</div>}
 						</For>
 					</div>
