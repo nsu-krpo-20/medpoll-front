@@ -1,13 +1,16 @@
 import { Navigate, useNavigate } from '@solidjs/router';
-import { createSignal, For } from 'solid-js'
+import { createSignal, For , Show} from 'solid-js'
 import { logout, user } from 'src/libs/user';
 import { Avatar, IconButton, Menu, MenuItem, Divider, Typography } from "@suid/material";
+import QRCodeView from "./QRcodeView"
 import Logout from "@suid/icons-material/Logout";
+import QrCodeIcon from "@suid/icons-material/QrCode";
 import './TopBar.css'
 import { Person } from '@suid/icons-material';
 
 function UserDisplay() {
 	const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
+	const [qrOpened, setQrOpened] = createSignal<boolean>(false);
 	const navigate = useNavigate();
 	const open = () => Boolean(anchorEl());
 	const handleClose = () => setAnchorEl(null);
@@ -31,6 +34,14 @@ function UserDisplay() {
 	]
 
 	return (<>
+		<Show when={qrOpened()}>
+			<QRCodeView data={"Placeholder"} onModalClose={()=>setQrOpened(false)}/>
+		</Show>
+		<IconButton
+			sx={{mr: 2, ml: "auto"}}
+			onClick={()=>setQrOpened(!qrOpened())}>
+			<QrCodeIcon/>	
+		</IconButton>
 		<IconButton
 			sx={{mr: 2, ml: "auto"}}
 			onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -103,7 +114,7 @@ function TopBar() {
 	return ( <>
 		<header class="topbar h-full">
 		<h1> MedPoll </h1>
-		{ user() ? <UserDisplay /> : <LoginButton /> }
+		{ !user() ? <UserDisplay /> : <LoginButton /> }
 		</header>
 	</> )
 }
