@@ -98,7 +98,7 @@ export function ViewPatientPage() {
 			</h1>
 			
 			<div class="flex flex-row grow justify-around gap-x-2 lg:gap-x-4 py-8">
-				<Paper class="basis-[66%] px-4 py-4 min-w-[500px]">
+				<Paper class="basis-[66%] px-4 py-4 min-w-[512px]">
 					{ /* TS shut up pls */ }
 					<Dynamic component={leftStateToComponent[leftState()]} card={card} loadingCl={loadingClasslist} />
 				</Paper>

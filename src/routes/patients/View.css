@@ -12,7 +12,9 @@ h1.missing {
 .leftHeader {
 	@apply
 	pb-2
-	font-semibold text-2xl
+	font-semibold
+	text-[1.35rem]
+	lg:text-2xl
 }
 
 .propDisplayName {
