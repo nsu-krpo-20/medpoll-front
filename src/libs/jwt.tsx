@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { authedClient, unauthedClient } from "./api";
 
 const STORAGE_TOKEN_KEY = "token_access"
+const jwtBC = new BroadcastChannel("jwt");
 
 type JWT = string;
 type MaybeJWT = string | null;
@@ -45,9 +46,8 @@ function updateToken(newJwt: MaybeJWT) {
 
 	setJwtToken(newJwt);
 
-	const event = new Event("jwtSet");
-	console.log("Dispatching jwtSet", newJwt)
-	window.dispatchEvent(event);
+	window.dispatchEvent(new Event("jwtSet"));
+	jwtBC.postMessage({token: newJwt});
 }
 
 export function clearToken() {
@@ -88,16 +88,34 @@ export function refreshToken() : Promise<JWT> {
 		window.navigator.locks.request("refresh_token", {
 			ifAvailable: true,
 		}, async (lock) => {
-			// Failed to acquire lock due to a refresh already running; don't refresh
-			if (lock == null) reject(false);
+			// Failed to acquire lock due to a refresh already running;
+			// just listen for errors/successes from whoever called it
+			if (lock == null) {
+				var onSet = () => {
+					window.removeEventListener("jwtFailRefresh", onFail);
+					resolve(getToken()!);
+				}
+
+				var onFail = () => {
+					window.removeEventListener("jwtSet", onSet);
+					reject();
+				}
+				
+				window.addEventListener("jwtSet", onSet, { once: true });
+				window.addEventListener("jwtFailRefresh", onFail, { once: true });
+				return;
+			}
 
 			try {
 				var resp = await unauthedClient.post("/api/v1/auth/refresh");
 
 				setToken(resp.data.accessToken);
 				resolve(getToken()!);
-			} catch(err) {
-				console.error(err);
+			} catch(err : any) {
+				// note: BroadcastChannel spec says messages are sent to **other** channels
+				// so we can't read our own messages
+				jwtBC.postMessage({error: err.toString()});
+				window.dispatchEvent(new Event("jwtFailRefresh"));
 				reject(err);
 			}
 		})
@@ -139,5 +157,15 @@ window.addEventListener("storage", (event) => {
 
 	updateToken(event.newValue);
 });
+
+jwtBC.onmessage = (ev) => {
+	console.log("JWT event data:", ev.data);
+	if (ev.data?.error) {
+		window.dispatchEvent(new Event("jwtFailRefresh"));
+	} else if (ev.data?.token) {
+		// this should be done from the "storage" event listener, not here
+		// window.dispatchEvent(new Event("jwtSet"));
+	}
+}
 
 initializeToken();
