@@ -18,11 +18,28 @@ authedClient.interceptors.request.use(async config => {
 		// wait until it's refreshed
 
 		await new Promise<void>((res, rej) => {
-			window.addEventListener("jwtSet", () => {
+			var onFail : () => void,
+			    onRefresh : () => void;
+
+			const removeListeners = () => {
+				window.removeEventListener("jwtSet", onRefresh);
+				window.removeEventListener("jwtFailRefresh", onFail);
+			}
+
+			onRefresh = () => {
 				if (getToken() && !isTokenExpired(getToken()!)) {
+					removeListeners();
 					res();
 				}
-			});
+			}
+
+			onFail = () => {
+				removeListeners();
+				rej("JWT refresh failed");
+			}
+
+			window.addEventListener("jwtSet", onRefresh);
+			window.addEventListener("jwtFailRefresh", onFail);
 		});
 
 		console.assert(!!getToken()!);
