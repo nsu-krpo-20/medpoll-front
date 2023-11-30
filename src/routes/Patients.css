@@ -6,7 +6,7 @@
 	filter: drop-shadow(1px 1px 3px rgb(0 0 0 / 0.3));
 
 	@apply
-	bg-white grow-0
+	bg-white
 }
 
 .absoluteCenter {
@@ -17,8 +17,6 @@
 .cardListGridContainer {
 	@apply
 	flex grow flex-col
-	bg-slate-50 shadow-inner
-	px-4
 	py-2 mb-2
 }
 
