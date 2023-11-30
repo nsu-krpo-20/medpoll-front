@@ -10,6 +10,7 @@ import * as Cards from "src/libs/patientcard";
 import './View.css'
 import { ViewInfo } from "./ViewComponents/leftpanel";
 import { ViewPairing } from "./ViewComponents/rightpanel";
+import { createStore } from "solid-js/store";
 
 async function fetchCard(id : number) : Promise<AxiosResponse<Cards.PatientCard, any>> {
 	// Invalid ID passed in route; don't try fetching anything
@@ -23,7 +24,7 @@ const rightStateToComponent = {
 	qr: ViewPairing,
 }
 
-const leftStateToComponent = {
+const leftStateToComponent : any = {
 	info: ViewInfo,
 }
 
@@ -68,16 +69,17 @@ export function ViewPatientPage() {
 	// We might have *some* data about the card from the state
 	// (ie when the user comes here from the patients list)
 	// We can use it to display initial data while we fetch details via the dedicated route
-	const [card, setCard] = createSignal(useLocation().state as Cards.PatientCard)
-	var loading = true;
-	var missing = () => !card();
-	const [fetchedCard] = createResource(id, fetchCard);
+	const [card, setCard] = createStore<Cards.PatientCard>(useLocation().state as Cards.PatientCard)
+
+	var missing = () => !card;
+	const [cardRes] = createResource(id, fetchCard);
 	const [leftState, setLeftState] = createSignal("info");
 
 	createEffect(() => {
-		if (fetchedCard()) {
-			setCard(fetchedCard()!.data);
-			loading = false;
+		// you can't get() a resource if it errors, because it'll bubble the error up... lol
+		// https://github.com/solidjs/solid/discussions/1888#discussioncomment-7060132
+		if (!cardRes.error && cardRes()) {
+			setCard(cardRes()!.data);
 		}
 	})
 
@@ -85,7 +87,7 @@ export function ViewPatientPage() {
 
 	}
 
-	const loadingClasslist = () => ({loading: loading, missing: missing()});
+	const loadingClasslist = () => ({loading: cardRes.loading, missing: missing(), error: cardRes.error});
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 		<div class="w-full h-12">
@@ -94,17 +96,16 @@ export function ViewPatientPage() {
 
 		<div class="pageContent">
 			<h1 classList={{patientName: true, ...loadingClasslist()}}>
-				{card() ? card().fullName : "Загрузка..."}
+				{card ? card.fullName : "Загрузка..."}
 			</h1>
-			
+
 			<div class="flex flex-row grow justify-around gap-x-2 lg:gap-x-4 py-8">
 				<Paper class="basis-[66%] px-4 py-4 min-w-[512px]">
-					{ /* TS shut up pls */ }
-					<Dynamic component={leftStateToComponent[leftState()]} card={card} loadingCl={loadingClasslist} />
+					<Dynamic card={[card, setCard]} loadingCl={loadingClasslist} component={leftStateToComponent[leftState()]} />
 				</Paper>
 
 				<Paper class="basis-[34%] min-w-[300px]">
-					<RightPanel card={card} loadingCl={loadingClasslist} onSelect={onSelectRightTab} />
+					<RightPanel card={[card, setCard]} loadingCl={loadingClasslist} onSelect={onSelectRightTab} />
 				</Paper>
 			</div>
 		</div>
