@@ -61,6 +61,7 @@ export function ViewInfo(props: any) : JSX.Element {
 
 		for (var prop of propToDisplay) {
 			prop.signal.set(cardObj?.[prop.key] || placeholder())
+			prop.error!.set(false);
 		}
 	}
 
@@ -120,26 +121,6 @@ export function ViewInfo(props: any) : JSX.Element {
 	return <div class="flex flex-col">
 		<h2 class="flex leftHeader w-full">
 			<span class="shrink-0 whitespace-nowrap mr-2">Основные данные</span>
-			<div class="inline-flex w-fit ml-auto mr-0 items-end justify-center gap-x-4">
-				<Show when={editing()}>
-					<Button variant="contained" class="" onClick={cancelEdit}>
-						<Cancel class="mr-2"/>
-						Отмена
-					</Button>
-					<Button variant="contained" class="" onClick={confirmEdit}>
-						<Save class="mr-2"/>
-						Сохранить
-					</Button>
-				</Show>
-				<Show when={!editing()}>
-					<Button variant="contained" class="float-right"
-					        onClick={startEdit} disabled={loadingCl().loading || loadingCl().error}>
-						<Edit class="mr-2"/>
-						Редактировать
-					</Button>
-				</Show>
-			</div>
-
 		</h2>
 
 		<div class="pl-2 pt-4">
@@ -180,6 +161,26 @@ export function ViewInfo(props: any) : JSX.Element {
 					</div>
 				}
 			</For>
+
+			<div class="flex flex-wrap-reverse gap-y-2 w-full mr-0 justify-end gap-x-4">
+				<Show when={editing()}>
+					<Button variant="contained" class="" onClick={cancelEdit}>
+						<Cancel class="mr-2"/>
+						Отмена
+					</Button>
+					<Button variant="contained" class="" onClick={confirmEdit}>
+						<Save class="mr-2"/>
+						Сохранить
+					</Button>
+				</Show>
+				<Show when={!editing()}>
+					<Button variant="contained" class="float-right"
+					        onClick={startEdit} disabled={loadingCl().loading || loadingCl().error}>
+						<Edit class="mr-2"/>
+						Редактировать
+					</Button>
+				</Show>
+			</div>
 		</div>
 	</div>
 }
