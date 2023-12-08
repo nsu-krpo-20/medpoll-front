@@ -1,0 +1,9 @@
+.prescriptionCard {
+	@apply
+	flex-1 p-2
+}
+
+.listCard {
+	@apply
+	min-w-[336px]
+}
