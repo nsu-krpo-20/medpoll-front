@@ -106,6 +106,8 @@ export function refreshToken() : Promise<JWT> {
 				return;
 			}
 
+			console.log("Refreshing token...");
+
 			try {
 				var resp = await unauthedClient.post("/api/v1/auth/refresh");
 
@@ -159,7 +161,6 @@ window.addEventListener("storage", (event) => {
 });
 
 jwtBC.onmessage = (ev) => {
-	console.log("JWT event data:", ev.data);
 	if (ev.data?.error) {
 		window.dispatchEvent(new Event("jwtFailRefresh"));
 	} else if (ev.data?.token) {

@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { authedClient } from "./api";
+import { Prescription } from "./prescription";
 
 interface NewCardFields {
 	fullName: string,
@@ -10,26 +11,7 @@ interface NewCardFields {
 interface PatientCard extends NewCardFields {
 	id: number,
 	description: string | null,
-	prescriptions: object | null,
-}
-
-interface Prescription {
-	name: string,
-	phoneNumber: string | null,
-	snils: string | null,
-}
-
-interface PrescriptionMedicine {
-	name: string,
-	dose: string | null,
-	periodType: number,
-	period: string | number[],
-}
-
-interface PrescriptionMetric {
-	name: string,
-	periodType: number,
-	period: string | number[],
+	prescriptions: Prescription[] | null,
 }
 
 async function submitNew(data : NewCardFields) {
@@ -89,7 +71,4 @@ export {
 export type {
 	NewCardFields,
 	PatientCard,
-	Prescription,
-	PrescriptionMedicine,
-	PrescriptionMetric
 }

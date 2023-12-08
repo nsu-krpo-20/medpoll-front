@@ -23,7 +23,7 @@
 	@apply
 	h-full
 	px-4 lg:px-8 xl:px-16
-	pt-4
+	pt-4 pb-4
 	flex flex-col
 }
 
@@ -33,9 +33,16 @@ h1 {
 }
 
 h2 {
-	font-size: 2.2em;
+	font-size: 2.6em;
+	line-height: 1.1;
 }
 
+h3 {
+	font-size: 1.6em;
+	line-height: 1.1;
+}
+
+/*
 a {
 	@apply
 	underline
@@ -54,6 +61,8 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+
 button:hover {
   border-color: #646cff;
 }
@@ -61,6 +70,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+*/
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -68,7 +78,9 @@ button:focus-visible {
     background-color: rgb(243, 246, 249);
   }
 
+  /*
   button {
     background-color: #f9f9f9;
   }
+  */
 }
