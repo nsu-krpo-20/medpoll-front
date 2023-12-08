@@ -13,6 +13,7 @@ import { createEffect } from 'solid-js';
 import * as Constants from "src/consts"
 import { ViewPatientPage } from './routes/patients/View';
 import { createTheme, ThemeProvider } from '@suid/material';
+import { CreatePrescriptionPage } from './routes/prescriptions/Create';
 
 const root = document.getElementById('root')
 
@@ -20,7 +21,7 @@ const theme = createTheme({
 	components: {
 	  MuiButtonBase: {
 		defaultProps: {
-		  disableRipple: true,
+		  // disableRipple: true,
 		},
 	  },
 	},
@@ -66,6 +67,7 @@ render(() => {
 			<Route path="/login" component={AuthPage} />
 			<Route path="/patients" component={PatientsPage} />
 			<Route path="/patients/view/:id" component={ViewPatientPage} />
+			<Route path="/patients/createPrescription/:id" component={CreatePrescriptionPage} />
 			<Route path="/register" component={RegisterPage} />
 		</Routes>
 		</ThemeProvider>

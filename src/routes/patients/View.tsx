@@ -9,7 +9,7 @@ import { authedClient } from "src/libs/api";
 import * as Cards from "src/libs/patientcard";
 import './View.css'
 import { ViewInfo } from "./ViewComponents/leftpanel";
-import { ViewPairing } from "./ViewComponents/rightpanel";
+import { ViewPairing, ViewPrescriptions } from "./ViewComponents/rightpanel";
 import { createStore } from "solid-js/store";
 
 async function fetchCard(id : number) : Promise<AxiosResponse<Cards.PatientCard, any>> {
@@ -19,8 +19,8 @@ async function fetchCard(id : number) : Promise<AxiosResponse<Cards.PatientCard,
 	return authedClient.get(`/api/v1/cards/${id}`);
 }
 
-const rightStateToComponent = {
-	info: null,
+const rightStateToComponent : any = {
+	prescriptions: ViewPrescriptions,
 	qr: ViewPairing,
 }
 
@@ -30,7 +30,6 @@ const leftStateToComponent : any = {
 
 function RightPanel(props) : JSX.Element {
 	const tabs = [
-		{label: "Информация", icon: <Info />, state: "info"},
 		{label: "Назначения", icon: <Book />, state: "prescriptions"},
 		{label: "Сопряжение", icon: <QrCode />, state: "qr"},
 		// If you're adding more, make sure you update the min-w of the right-side panel too
@@ -63,7 +62,7 @@ function RightPanel(props) : JSX.Element {
 
 
 export function ViewPatientPage() {
-	const params = useParams(); // 👈 Get the dynamic route parameters
+	const params = useParams();
 	const id = Number(params.id);
 
 	// We might have *some* data about the card from the state
@@ -95,16 +94,16 @@ export function ViewPatientPage() {
 		</div>
 
 		<div class="pageContent">
-			<h1 classList={{patientName: true, ...loadingClasslist()}}>
+			<h2 classList={{patientName: true, ...loadingClasslist()}}>
 				{card ? card.fullName : "Загрузка..."}
-			</h1>
+			</h2>
 
-			<div class="flex flex-row grow justify-around gap-x-2 lg:gap-x-4 py-8">
-				<Paper class="basis-[66%] px-4 py-4 min-w-[512px]">
+			<div class="flex flex-row grow justify-around gap-x-2 lg:gap-x-4 pt-4">
+				<Paper class="leftCard">
 					<Dynamic card={[card, setCard]} loadingCl={loadingClasslist} component={leftStateToComponent[leftState()]} />
 				</Paper>
 
-				<Paper class="basis-[34%] min-w-[300px]">
+				<Paper class="rightCard">
 					<RightPanel card={[card, setCard]} loadingCl={loadingClasslist} onSelect={onSelectRightTab} />
 				</Paper>
 			</div>
