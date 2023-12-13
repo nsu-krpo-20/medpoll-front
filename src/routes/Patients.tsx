@@ -1,12 +1,11 @@
 import { Add } from "@suid/icons-material";
-import { Button, Divider, Grow, ListItemButton, Modal, Paper, TextField, Typography } from "@suid/material";
-import { createEffect, createSignal, For } from 'solid-js';
+import { Button, Grow, Modal, Paper, TextField, Typography } from "@suid/material";
+import { createEffect, createSignal} from 'solid-js';
 import TopNav from "src/components/TopBar";
 import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
 import { createPagination } from "@solid-primitives/pagination";
-import { useNavigate } from "@solidjs/router";
 import Searchbar from "src/components/Searchbar";
 import PatientsGrid from "src/components/PatientsGrid";
 
@@ -49,7 +48,7 @@ function NewPatientModal(props : {isOpen: boolean, closeModal: any, onSubmit: an
 	const submitCard = (e: SubmitEvent) => {
 		e.preventDefault();
 
-		Cards.submitNew(form).then((resp) => {
+		Cards.submitNew(form).then(() => {
 			closeModal();
 			props.onSubmit();
 		}).catch((err) => {
@@ -88,6 +87,7 @@ export default function PatientsPage() {
 	const [isNewPatient, setIsNewPatient] = createSignal(false);
 	const [cards, setCards] = createSignal([] as Cards.PatientCard[]);
 	const [cardCount, setCardCount] = createSignal(0);
+	const [searchQuerry, setSearchQuerry] = createSignal<string | undefined>(undefined);
 
 	/* <TotallyNotAHack> */
 	var currentOpts = {
@@ -108,24 +108,17 @@ export default function PatientsPage() {
 
 	const closeNewPatient = () => setIsNewPatient(false);
 	const openNewPatient = () => setIsNewPatient(true);
-	const navigate = useNavigate();
 
 	const cardsPerPage = 50;
 
-	const fetchCards = (page?: number) => {
-		return Cards.fetchMultiple((page ? (page - 1) : 0) * cardsPerPage, cardsPerPage).then((resp) => {
-			return resp;
-		});
-	}
+	const fetchCards = (page?: number) => Cards.fetchMultiple(
+										(page ? (page - 1) : 0) * cardsPerPage, 
+										cardsPerPage, 
+										searchQuerry())
 
 	Cards.fetchCount().then(setCardCount);
-
 	const fetchCurrentPage = () => fetchCards(page()).then((data) => setCards(data));
-
 	const onNewCard = () =>	fetchCurrentPage();
-
-	const gotoCard = (card : Cards.PatientCard) => navigate(`/patients/view/${card.id}`, {state: card});
-
 	createEffect(fetchCurrentPage);
 
 	return (
@@ -137,7 +130,7 @@ export default function PatientsPage() {
 			<div class="pageContent">
 				<div class="flex justify-between">
 					<h2 class="pb-4"> Список пациентов </h2>
-					<Searchbar/>
+					<Searchbar setSearchQuerry={setSearchQuerry}/>
 				</div>
 				<div class="pb-4">
 					<Button variant="contained" color="success" onClick={openNewPatient}>
@@ -148,7 +141,9 @@ export default function PatientsPage() {
 				<PatientsGrid pgProps={pgProps}
 											cards={cards}/>
 				
-				<NewPatientModal isOpen={isNewPatient()} closeModal={closeNewPatient} onSubmit={onNewCard}/>
+				<NewPatientModal isOpen={isNewPatient()} 
+												 closeModal={closeNewPatient} 
+												 onSubmit={onNewCard}/>
 			</div>
 		</div>
 	)
