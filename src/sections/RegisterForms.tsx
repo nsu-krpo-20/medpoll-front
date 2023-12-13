@@ -3,8 +3,8 @@ import { createStore } from 'solid-js/store'
 import './LoginForms.css'
 import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
-import { authedClient } from "src/libs/api";
-import { AxiosResponse } from 'axios';
+import { authedClient, unauthedClient } from "src/libs/api";
+import { AxiosError, AxiosResponse } from 'axios';
 import { setToken } from 'src/libs/jwt';
 
 type RegisterFormFields = {
@@ -12,14 +12,13 @@ type RegisterFormFields = {
 	password?: string;
 };
 
-function translateErr(err: any) {
-	/* TODO */
-	return err;
+function translateErr(err: AxiosError) {
+	return err.response?.data?.message || err.message;
 }
 
 async function submit(form: RegisterFormFields, endpoint: string) {
 	return new Promise<AxiosResponse>((res, rej) => {
-		authedClient.post(endpoint, {
+		unauthedClient.post(endpoint, {
 			login: form.login,
 			password: form.password,
 		}).then((resp: AxiosResponse) => {
@@ -39,7 +38,7 @@ function validateForm(form: RegisterFormFields) {
 	}
 
 	if (form.password.length < Constants.MIN_PASSWORD_LENGTH) {
-		return "Пароль не может быть короче ${Constants.MIN_PASSWORD_LENGTH} символов."
+		return `Пароль не может быть короче ${Constants.MIN_PASSWORD_LENGTH} символов.`
 	}
 }
 function useRegisterForm() {
@@ -80,7 +79,7 @@ function RegisterForms() {
 			setToken(out.data.accessToken);
 			navigate("/", { replace: true });
 		}).catch((e: any) => {
-			setError(translateErr(e.message));
+			setError(translateErr(e));
 
 			var pw = document.getElementById("pwEntry") as HTMLInputElement;
 			if (pw) {
