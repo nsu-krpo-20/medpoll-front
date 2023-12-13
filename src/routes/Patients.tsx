@@ -6,7 +6,9 @@ import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
 import { createPagination } from "@solid-primitives/pagination";
-import { Navigate, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
+import Searchbar from "src/components/Searchbar";
+import PatientsGrid from "src/components/PatientsGrid";
 
 /*
 const [tabs, setTabs] = createSignal([
@@ -101,7 +103,7 @@ export default function PatientsPage() {
 		setPageOpts({...currentOpts})
 	})
 
-	const [pgProps, page, setPage] = createPagination(pageOpts);
+	const [pgProps, page, ] = createPagination(pageOpts);
 	/* </TotallyNotAHack> */
 
 	const closeNewPatient = () => setIsNewPatient(false);
@@ -118,22 +120,11 @@ export default function PatientsPage() {
 
 	Cards.fetchCount().then(setCardCount);
 
-	const fetchCurrentPage = () => {
-		fetchCards(page())
-			.then((data) => {
-				setCards(data);
-			});
-	}
+	const fetchCurrentPage = () => fetchCards(page()).then((data) => setCards(data));
 
-	const onNewCard = () => {
-		fetchCurrentPage();
-	}
+	const onNewCard = () =>	fetchCurrentPage();
 
-	const gotoCard = (card : Cards.PatientCard) => {
-		return navigate(`/patients/view/${card.id}`, {
-			state: card
-		})
-	}
+	const gotoCard = (card : Cards.PatientCard) => navigate(`/patients/view/${card.id}`, {state: card});
 
 	createEffect(fetchCurrentPage);
 
@@ -144,41 +135,19 @@ export default function PatientsPage() {
 			</div>
 
 			<div class="pageContent">
-				<h2 class="pb-4"> Список пациентов </h2>
-
+				<div class="flex justify-between">
+					<h2 class="pb-4"> Список пациентов </h2>
+					<Searchbar/>
+				</div>
 				<div class="pb-4">
 					<Button variant="contained" color="success" onClick={openNewPatient}>
 						<Add /> Создать
 					</Button>
 				</div>
-
-				<div class="flex flex-row justify-center gap-x-2 pb-2">
-					<For each={pgProps()}>
-						{ (props) =>
-						<button class="cardPageBtn" {...props} />
-					}
-					</For>
-				</div>
-			
-				<div class="cardListGridContainer">
-					<div class="cardListGrid">
-						<For each={cards()}>
-							{(pat, i) =>
-							<div class="patientCardFrame flex flex-col">
-								<div class="patientCardDetails flex flex-col px-2 py-1 grow">
-									<span class="truncate whitespace-nowrap font-bold"> {pat.fullName} </span>
-									{pat.phoneNumber ? <span> {pat.phoneNumber} </span>
-									    : <span class="text-neutral-300"> - </span> }
-								</div>
-								<Divider/>
-								<ListItemButton sx={{flexGrow: 0}} onClick={() => gotoCard(pat)}>
-									Перейти
-								</ListItemButton>
-							</div>}
-						</For>
-					</div>
-				</div>
-
+				
+				<PatientsGrid pgProps={pgProps}
+											cards={cards}/>
+				
 				<NewPatientModal isOpen={isNewPatient()} closeModal={closeNewPatient} onSubmit={onNewCard}/>
 			</div>
 		</div>
