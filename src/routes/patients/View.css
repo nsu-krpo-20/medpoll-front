@@ -39,6 +39,22 @@ h1.missing {
 	px-4 pb-4
 }
 
+.prescriptionListBtn * {
+	@apply
+	leading-none
+}
+
+.createdTime {
+	@apply
+	leading-normal text-neutral-500
+}
+
+.editedTime {
+	@apply
+	leading-none text-neutral-400
+}
+
+
 /*
 .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline {
 	@apply
