@@ -78,6 +78,12 @@ export function ViewPatientPage() {
 		// you can't get() a resource if it errors, because it'll bubble the error up... lol
 		// https://github.com/solidjs/solid/discussions/1888#discussioncomment-7060132
 		if (!cardRes.error && cardRes()) {
+			cardRes()!.data.prescriptions?.sort((a, b) => {
+				if (a.editedTime > b.editedTime) return -1;
+				if (a.editedTime < b.editedTime) return 1;
+				return 0;
+			});
+
 			setCard(cardRes()!.data);
 		}
 	})
