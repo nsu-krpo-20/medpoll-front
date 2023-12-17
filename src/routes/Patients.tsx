@@ -87,7 +87,6 @@ export default function PatientsPage() {
 	const [isNewPatient, setIsNewPatient] = createSignal(false);
 	const [cards, setCards] = createSignal([] as Cards.PatientCard[]);
 	const [cardCount, setCardCount] = createSignal(0);
-	const [searchQuerry, setSearchQuerry] = createSignal<string | undefined>(undefined);
 
 	/* <TotallyNotAHack> */
 	var currentOpts = {
@@ -113,8 +112,7 @@ export default function PatientsPage() {
 
 	const fetchCards = (page?: number) => Cards.fetchMultiple(
 										(page ? (page - 1) : 0) * cardsPerPage, 
-										cardsPerPage, 
-										searchQuerry())
+										cardsPerPage)
 
 	Cards.fetchCount().then(setCardCount);
 	const fetchCurrentPage = () => fetchCards(page()).then((data) => setCards(data));
@@ -130,7 +128,7 @@ export default function PatientsPage() {
 			<div class="pageContent">
 				<div class="flex justify-between">
 					<h2 class="pb-4"> Список пациентов </h2>
-					<Searchbar setSearchQuerry={setSearchQuerry}/>
+					<Searchbar/>
 				</div>
 				<div class="pb-4">
 					<Button variant="contained" color="success" onClick={openNewPatient}>

@@ -1,13 +1,16 @@
-import { Component, JSX, Setter, createSignal } from "solid-js"
+import { Component, JSX, createSignal } from "solid-js"
+import { useNavigate } from "@solidjs/router"
 
-const Searchbar: Component<{setSearchQuerry: Setter<string | undefined>}> = (props) => {
-	const [querry, setQuerry] = createSignal<string | undefined>(undefined);
+const Searchbar: Component = () => {
+	const [query, setQuery] = createSignal<string | undefined>(undefined);
 	const handleInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (e) => {
 		const inputElement = e.currentTarget as HTMLInputElement;
-  	setQuerry(inputElement.value == "" ? undefined : inputElement.value);
+  	setQuery(inputElement.value == "" ? undefined : inputElement.value);
 	};
+	const navigate = useNavigate();
+	const gotoSearch = () => navigate(`/patients/search?q=${query()}`);
 
-	return <form onSubmit={() => props.setSearchQuerry(querry())}>   
+	return <form onSubmit={gotoSearch}>   
   	<label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Поиск</label>
   	<div class="relative">
       	<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
