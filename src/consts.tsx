@@ -5,3 +5,4 @@ export const JWT_AUTOREFRESH_GRACE = 60;
 
 // TODO: This should be configured better... somehow..?
 export const BASE_URL = "http://localhost:1337/"
+export const API_URL = "http://localhost:1337/api/v1"
