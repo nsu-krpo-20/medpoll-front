@@ -1,30 +1,58 @@
 import * as Cards from "src/libs/patientcard";
-import { Accessor, createEffect, createSignal, For, JSX } from "solid-js";
-import { Button, List, ListItem, ListItemButton } from "@suid/material";
+
+import { Accessor, Component, createEffect, createResource, createSignal, For, JSX, JSXElement, Show } from "solid-js";
+import { Button, CircularProgress, List, ListItem, ListItemButton } from "@suid/material";
 import { Book, BookmarkAdd, Create, CreateNewFolder, Edit } from "@suid/icons-material";
 import { Store } from "solid-js/store";
 import { Prescription } from "src/libs/prescription";
 import { useNavigate } from "@solidjs/router";
 
+import QRCodeView from "src/components/QRcodeView";
+import { authedClient } from "src/libs/api";
+import * as Constants from "src/consts"
+
+function fetchPatientToken(id: number) {
+	return authedClient.get(`/api/v1/cards/patientToken/${id}`);
+}
+
+
 export function ViewPairing(props : any) : JSX.Element {
 	const [card, setCard] : [card: Store<Cards.PatientCard>, setCard: any] = props.card;
 	const [editing, setEditing] = createSignal(false);
+
+	const [tokRes] = createResource(card.id, fetchPatientToken);
+	const [token, setToken] = createSignal<string>();
+
+	createEffect(() => {
+		if (!tokRes.error && tokRes()) {
+			console.log(tokRes()?.data);
+			setToken(tokRes()?.data);
+		}
+	})
+
+	const loadingToken = () => {
+		return <h3 class="pt-4 text-center">
+			Подождите, загружаем...
+			<CircularProgress />
+		</h3>
+	}
+
+	console.log(card);
 
 	return <div class="flex flex-col px-2">
 		<h2 class="leftHeader w-full text-center">
 			Сопряжение
 		</h2>
 
-		{ /* draw QR 'n stuff here */ }
-		<img src="https://i.imgur.com/9MlhoLo.png" />
+
+		<Show when={token()} fallback={loadingToken()}>
+			<QRCodeView data={Constants.API_URL + token()} />
+		</Show>
 	</div>
 }
 
-export function ViewPrescriptions(props) : JSX.Element {
+export function ViewPrescriptions(props : any) : JSX.Element {
 	const [card, setCard] : [card: Store<Cards.PatientCard>, setCard: any] = props.card;
-	const [editing, setEditing] = createSignal(false);
-
-	const prescr = null;
 	const nav = useNavigate();
 
 	const gotoPrescription = (presc : Prescription) => {
@@ -39,7 +67,7 @@ export function ViewPrescriptions(props) : JSX.Element {
 
 	createEffect(() => {
 		setPresc(
-			!card.prescriptions ? [] : [...card.prescriptions, ...card.prescriptions, ...card.prescriptions, ...card.prescriptions]
+			!card.prescriptions ? [] : [...card.prescriptions]
 		)
 	})
 
