@@ -1,10 +1,12 @@
 import * as Cards from "src/libs/patientcard";
+
 import { Accessor, Component, createEffect, createResource, createSignal, For, JSX, JSXElement, Show } from "solid-js";
 import { Button, CircularProgress, List, ListItem, ListItemButton } from "@suid/material";
 import { Book, BookmarkAdd, Create, CreateNewFolder, Edit } from "@suid/icons-material";
 import { Store } from "solid-js/store";
 import { Prescription } from "src/libs/prescription";
 import { useNavigate } from "@solidjs/router";
+
 import QRCodeView from "src/components/QRcodeView";
 import { authedClient } from "src/libs/api";
 import * as Constants from "src/consts"
@@ -12,6 +14,7 @@ import * as Constants from "src/consts"
 function fetchPatientToken(id: number) {
 	return authedClient.get(`/api/v1/cards/patientToken/${id}`);
 }
+
 
 export function ViewPairing(props : any) : JSX.Element {
 	const [card, setCard] : [card: Store<Cards.PatientCard>, setCard: any] = props.card;
@@ -41,6 +44,7 @@ export function ViewPairing(props : any) : JSX.Element {
 			Сопряжение
 		</h2>
 
+
 		<Show when={token()} fallback={loadingToken()}>
 			<QRCodeView data={Constants.API_URL + token()} />
 		</Show>
@@ -49,7 +53,6 @@ export function ViewPairing(props : any) : JSX.Element {
 
 export function ViewPrescriptions(props : any) : JSX.Element {
 	const [card, setCard] : [card: Store<Cards.PatientCard>, setCard: any] = props.card;
-
 	const nav = useNavigate();
 
 	const gotoPrescription = (presc : Prescription) => {
