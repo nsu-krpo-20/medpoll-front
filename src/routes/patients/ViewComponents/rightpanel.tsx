@@ -25,7 +25,6 @@ export function ViewPairing(props : any) : JSX.Element {
 
 	createEffect(() => {
 		if (!tokRes.error && tokRes()) {
-			console.log(tokRes()?.data);
 			setToken(tokRes()?.data);
 		}
 	})
@@ -36,8 +35,6 @@ export function ViewPairing(props : any) : JSX.Element {
 			<CircularProgress />
 		</h3>
 	}
-
-	console.log(card);
 
 	return <div class="flex flex-col px-2">
 		<h2 class="leftHeader w-full text-center">
