@@ -1,7 +1,7 @@
 import { Add } from "@suid/icons-material";
 import { Button, Divider, Grow, ListItemButton, Modal, Paper, TextField, Typography } from "@suid/material";
 import { createEffect, createSignal, For } from 'solid-js';
-import TopNav from "src/components/TopBar";
+import TopBar from "src/components/TopBar";
 import * as Cards from "src/libs/patientcard";
 import { useNewCardForm } from 'src/sections/PatientCard';
 import './Patients.css';
@@ -140,7 +140,7 @@ export default function PatientsPage() {
 	return (
 		<div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 			<div class="w-full h-12">
-				<TopNav />
+				<TopBar />
 			</div>
 
 			<div class="pageContent">

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "@solidjs/router";
 import { Dynamic } from "solid-js/web";
-import TopNav from "src/components/TopBar";
+import TopBar from "src/components/TopBar";
 import { authedClient } from "src/libs/api";
 import * as Cards from "src/libs/patientcard";
 import './Create.css'
@@ -114,7 +114,7 @@ export function CreatePrescriptionPage() {
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 	<div class="w-full h-12">
-		<TopNav />
+		<TopBar />
 	</div>
 
 	<div class="pageContent gap-y-3">

@@ -10,7 +10,6 @@ import { Person } from '@suid/icons-material';
 
 function UserDisplay() {
 	const [anchorEl, setAnchorEl] = createSignal<null | HTMLElement>(null);
-	const [qrOpened, setQrOpened] = createSignal<boolean>(false);
 	const navigate = useNavigate();
 	const open = () => Boolean(anchorEl());
 	const handleClose = () => setAnchorEl(null);
@@ -34,14 +33,6 @@ function UserDisplay() {
 	]
 
 	return (<>
-		<Show when={qrOpened()}>
-			<QRCodeView data={"Placeholder"} onModalClose={()=>setQrOpened(false)}/>
-		</Show>
-		<IconButton
-			sx={{mr: 2, ml: "auto"}}
-			onClick={()=>setQrOpened(!qrOpened())}>
-			<QrCodeIcon/>	
-		</IconButton>
 		<IconButton
 			sx={{mr: 2, ml: "auto"}}
 			onClick={(event) => setAnchorEl(event.currentTarget)}
@@ -51,7 +42,7 @@ function UserDisplay() {
 			class="userDisplay flex items-center justify-end ml-auto mr-2">
 				<Avatar class="" sx={{width: 32, height: 32}}/>
 		</IconButton>
-	
+
 		<Menu
         anchorEl={anchorEl()}
         id="account-menu"
@@ -110,13 +101,9 @@ function LoginButton() {
 	)
 }
 
-function TopBar() {
-	return ( <>
-		<header class="topbar h-full">
+export default function TopBar() {
+	return (<header class="topbar h-full">
 		<h1> MedPoll </h1>
-		{ !user() ? <UserDisplay /> : <LoginButton /> }
-		</header>
-	</> )
+		{ user() ? <UserDisplay /> : <LoginButton /> }
+	</header>)
 }
-
-export default TopBar;

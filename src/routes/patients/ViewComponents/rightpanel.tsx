@@ -53,7 +53,7 @@ export function ViewPrescriptions(props : any) : JSX.Element {
 	const nav = useNavigate();
 
 	const gotoPrescription = (presc : Prescription) => {
-		console.log("TODO: Go to prescription view page")
+		nav(`/prescription/${presc.id}`)
 	}
 
 	const gotoCreatePrescription = () => {
@@ -82,7 +82,8 @@ export function ViewPrescriptions(props : any) : JSX.Element {
 					const editedDate = new Date(p.editedTime);
 
 					return <ListItem disablePadding class="flex">
-						<ListItemButton class="prescriptionListBtn flex flex-col" sx={{alignItems: "flex-start"}}>
+						<ListItemButton class="prescriptionListBtn flex flex-col" sx={{alignItems: "flex-start"}}
+							onClick={(e) => gotoPrescription(p)}>
 							<h3>Назначение</h3>
 							<span class="createdTime">
 								Создано: {createdDate.toLocaleDateString("ru-RU")} {createdDate.toLocaleTimeString("ru-RU", {hour: "numeric", minute: "numeric"})}

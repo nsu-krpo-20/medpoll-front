@@ -4,7 +4,7 @@ import { BottomNavigation, BottomNavigationAction, Button, Paper } from "@suid/m
 import { AxiosResponse } from "axios";
 import { Accessor, createEffect, createResource, createSignal, For, JSX } from "solid-js";
 import { Dynamic } from "solid-js/web";
-import TopNav from "src/components/TopBar";
+import TopBar from "src/components/TopBar";
 import { authedClient } from "src/libs/api";
 import * as Cards from "src/libs/patientcard";
 import './View.css'
@@ -96,7 +96,7 @@ export function ViewPatientPage() {
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 		<div class="w-full h-12">
-			<TopNav />
+			<TopBar />
 		</div>
 
 		<div class="pageContent">

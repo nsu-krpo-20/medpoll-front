@@ -14,6 +14,7 @@ import * as Constants from "src/consts"
 import { ViewPatientPage } from './routes/patients/View';
 import { createTheme, ThemeProvider } from '@suid/material';
 import { CreatePrescriptionPage } from './routes/prescriptions/Create';
+import { ViewPrescriptionPage } from './routes/prescriptions/View';
 
 const root = document.getElementById('root')
 
@@ -68,6 +69,7 @@ render(() => {
 			<Route path="/patients" component={PatientsPage} />
 			<Route path="/patients/view/:id" component={ViewPatientPage} />
 			<Route path="/patients/createPrescription/:id" component={CreatePrescriptionPage} />
+			<Route path="/prescription/:id" component={ViewPrescriptionPage} />
 			<Route path="/register" component={RegisterPage} />
 		</Routes>
 		</ThemeProvider>
