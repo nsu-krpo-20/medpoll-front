@@ -1,17 +1,75 @@
 import { useLocation, useParams } from "@solidjs/router";
+import { Card, CardContent, Divider, Grow, Typography } from "@suid/material";
 import { AxiosResponse } from "axios";
-import { For, Show, createEffect, createResource } from "solid-js";
+import { Component, For, Show, createEffect, createResource } from "solid-js";
 import { createStore } from "solid-js/store";
 import TopBar from "src/components/TopBar";
 import { authedClient } from "src/libs/api";
-import { Prescription, periodToHumanText } from "src/libs/prescription";
+import { Prescription, PrescriptionMedicine, PrescriptionMetric, periodToHumanText } from "src/libs/prescription";
 
 async function fetchPrescription(id : number) : Promise<AxiosResponse<Prescription, any>> {
 	// Invalid ID passed in route; don't try fetching anything
-	if (isNaN(id)) return new Promise((res, rej) => rej);
+	if (isNaN(id)) return new Promise((rej) => rej);
 
 	return authedClient.get(`/api/v1/prescriptions/${id}`);
 }
+
+const MedsView: Component<{meds: PrescriptionMedicine}> = (props) =>
+{
+	const periodText = periodToHumanText(props.meds.periodType, 
+																			 props.meds.period as string)
+
+	return <Grow in={true}>
+		<Card class="p-2 flex flex-col gap-y-1">
+			<CardContent>
+				<Typography variant="h5">
+					{props.meds.name}
+				</Typography>
+				<Typography variant="body1">
+					Дозировка: {props.meds.dose}
+				</Typography>
+				<Typography variant="body1">
+					Приём {periodText.digest}
+				</Typography>
+			</CardContent>
+		</Card>
+	</Grow>
+}	
+
+const MedsListView: Component<{meds: PrescriptionMedicine[]}> = (props) => 
+  <div class="listCard flex flex-col gap-2 pt-2">
+		<For each={props.meds}>
+			{m => <MedsView meds={m}/>}
+		</For>
+	</div>
+	
+const MetricsView: Component<{metrics: PrescriptionMetric}> = (props) =>
+{	
+	const periodText = periodToHumanText(props.metrics.periodType, 
+																			 props.metrics.period as string)
+
+	return <Grow in={true}>
+		<Card class="p-2 flex flex-col gap-y-1">
+			<CardContent>
+				<Typography variant="h5">
+					{props.metrics.name}
+				</Typography>
+				<Typography variant="body1">
+					Замеры {periodText.digest}
+				</Typography>
+			</CardContent>
+		</Card>
+	</Grow>
+}	
+
+const MetricsListView: Component<{metrics: PrescriptionMetric[]}> = (props) => 
+  <div class="listCard flex flex-col gap-2 pt-2">
+		<For each={props.metrics}>
+			{m => <MetricsView metrics={m}/>}
+		</For>
+	</div>
+
+	
 
 export function ViewPrescriptionPage() {
 	const params = useParams();
@@ -19,7 +77,6 @@ export function ViewPrescriptionPage() {
 
 	const [prescription, setPresc] = createStore<Prescription>(useLocation().state as Prescription)
 
-	var missing = () => !prescription;
 	const [fetchRes] = createResource(id, fetchPrescription);
 
 	createEffect(() => {
@@ -37,33 +94,30 @@ export function ViewPrescriptionPage() {
 		</div>
 
 		<div class="pageContent">
-			<h2 class="pt-2"> STUB: просмотр назначения </h2>
+			<h2 class="-mb-3"> { /* cancel out the gap; the alternative is yet another flexbox */ }
+				Просмотр назначения
+			</h2>
 
-			<Show when={prescription} fallback={<h4> [загрузка назначения...] </h4>}>
-				<h3 class="pt-2"> Лекарства </h3>
-				<div class="flex flex-col px-3">
-					<For each={prescription.meds}>
-						{(med, i) => {
-							const periodText = periodToHumanText(med.periodType, med.period);
+			<Show when={prescription} fallback={<h4> [загрузка назначения...] </h4>}>	
+				<div class="flex flex-col md:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
+					<div class="prescriptionCard w-full">
+						<div class="flex w-full">
+							<h3>Лекарства</h3>
+						</div>
 
-							return <span>
-								- {med.name} (Дозировка: {med.dose}; приём {periodText.digest})
-							</span>
-						}}
-					</For>
-				</div>
-				
-				<h3 class="pt-2"> Метрики </h3>
-				<div class="flex flex-col px-3">
-					<For each={prescription.metrics}>
-						{(med, i) => {
-							const periodText = periodToHumanText(med.periodType, med.period);
+						<MedsListView meds={prescription.meds!} />
+					</div>
 
-							return <span>
-								- {med.name} ({periodText.digest})
-							</span>
-						}}
-					</For>
+					<Divider orientation="vertical"
+					 				 class="hidden md:block" />
+			
+					<div class="prescriptionCard w-full">
+						<div class="flex w-full">
+							<h3>Метрики</h3>
+						</div>
+
+						<MetricsListView metrics={prescription.metrics!} />
+					</div>
 				</div>
 			</Show>
 		</div>

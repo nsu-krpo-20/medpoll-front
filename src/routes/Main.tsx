@@ -1,4 +1,3 @@
-import { createSignal } from 'solid-js'
 import TopBar from "src/components/TopBar"
 import { user } from 'src/libs/user'
 import GreetAuthed from 'src/sections/GreetAuthed'

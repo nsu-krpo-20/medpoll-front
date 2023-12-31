@@ -1,27 +1,12 @@
 import { useNavigate, useParams } from "@solidjs/router";
-import { Dynamic } from "solid-js/web";
-import TopBar from "src/components/TopBar";
-import { authedClient } from "src/libs/api";
-import * as Cards from "src/libs/patientcard";
-import './Create.css'
-import { createStore } from "solid-js/store";
-import {Button, Divider, Paper} from "@suid/material";
-import { MetricsList } from "./components/MetricsList";
-import { Show, createSignal } from "solid-js";
-import { NewPrescription, PeriodType, PrescriptionDto, PrescriptionMedicine, PrescriptionMetric, PrescriptionToDto, SavePrescription } from "src/libs/prescription";
-import {MedsList} from "src/routes/prescriptions/components/MedsList.tsx";
 import { Medication, Save, Thermostat } from "@suid/icons-material";
-import { PeriodNPerDay } from "./components/Periods";
-
-const metricStub : PrescriptionMetric = {
-	name: "Крутая метрика",
-	period: [5000, 6000],
-	periodType: 1,
-}
-
-/*function fetchPrescription(id: number) {
-	return authedClient.get(`/api/v1/prescriptions/${id}`)
-}*/
+import { Button, Divider, Paper } from "@suid/material";
+import { Show, createSignal } from "solid-js";
+import TopBar from "src/components/TopBar";
+import { NewPrescription, PeriodType, PrescriptionMedicine, PrescriptionMetric, SavePrescription } from "src/libs/prescription";
+import { MedsList } from "src/routes/prescriptions/components/MedsList.tsx";
+import './Create.css';
+import { MetricsList } from "./components/MetricsList";
 
 export function CreatePrescriptionPage() {
 	const params = useParams();
@@ -143,12 +128,8 @@ export function CreatePrescriptionPage() {
 			</div>
 
 			<Divider orientation="vertical"
-					 class="hidden md:block"
-			/>
-			{/*
-			<Paper class="prescriptionCard">
-			</Paper>
-			*/}
+					 class="hidden md:block" />
+
 			<div class="prescriptionCard w-full">
 				<div class="flex w-full">
 					<h3>
