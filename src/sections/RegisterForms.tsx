@@ -1,11 +1,12 @@
-import { createSignal } from 'solid-js'
+import { Show, createSignal } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import './LoginForms.css'
 import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
-import { authedClient, unauthedClient } from "src/libs/api";
+import { unauthedClient } from "src/libs/api";
 import { AxiosError, AxiosResponse } from 'axios';
 import { setToken } from 'src/libs/jwt';
+import { Grid, Paper, Stack, Box, Typography, TextField, Button, Alert } from '@suid/material';
 
 type RegisterFormFields = {
 	login?: string;
@@ -91,23 +92,47 @@ function RegisterForms() {
 		})
 	}
 
-	return ( <>
-		<div class="h-full w-full flex justify-center items-center">
-			<div class="loginFrame h-fit flex flex-col justify-center items-center">
-				<h1> Регистрация </h1>
-				<form class="loginForm flex flex-col" 
-							onSubmit={onRegisterSubmit}>
-					<input type="text" placeholder="Логин" 
-								 onChange={updateField("login")} />
-					<input id="pwEntry" type="text" placeholder="Пароль" 
-									onChange={updateField("password")} />
+	return ( 
+			<Grid container
+					spacing={0}
+  				direction="column"
+  				alignItems="center"
+ 					justifyContent="center"
+					maxWidth="sm">
+			<Paper component={Stack} 
+						 direction="column" 
+						 justifyContent="center">
+				<Box component="form" onSubmit={onRegisterSubmit} 
+						 alignItems="center"
+						 p={3}>
+					<Typography variant="h3"> 
+						Регистрация пользователя
+					</Typography>
+					<TextField margin="dense" 
+										 required
+										 fullWidth
+										 label="Логин"
+										 onChange={updateField("login")} />
+					<TextField margin="dense" 
+										 required
+										 fullWidth
+										 label="Пароль"
+										 id="pwEntry" 
+										 type="password" 
+										 onChange={updateField("password")} />
 
-					<input type="submit" value="Регистрация" name="login" class="mx-4" />
-				</form>
-				{ error() ? <p class="formError"> {error()} </p>: null}
-			</div>
-		</div>
-	</> )
+					<Button type="submit"
+									fullWidth
+									variant="contained"
+									color="primary">
+						Регистрация
+					</Button>
+					<Show when={error()}>
+						<Alert severity="error"> {error()} </Alert>
+					</Show>
+				</Box> 
+			</Paper>	
+		</Grid> )	
 }
 
 export default RegisterForms;

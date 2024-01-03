@@ -1,11 +1,12 @@
-import { createSignal } from 'solid-js'
-import { createStore } from 'solid-js/store'
-import './LoginForms.css'
-import * as Constants from "src/consts"
 import { useNavigate } from '@solidjs/router';
-import { authedClient } from "src/libs/api";
 import { AxiosResponse } from 'axios';
+import { Component, Show, createSignal } from 'solid-js';
+import { createStore } from 'solid-js/store';
+import * as Constants from "src/consts";
+import { authedClient } from "src/libs/api";
 import { setToken } from 'src/libs/jwt';
+import './LoginForms.css';
+import { Alert, Box, Button, Grid, Paper, Stack, TextField, Typography } from '@suid/material';
 
 type LoginFormFields = {
 	login?: string;
@@ -71,7 +72,8 @@ function useLoginForm() {
 	return { form, submit, updateField };
 };
 
-function LoginForms() {
+const LoginForms: Component<{}> = () => 
+{
 	const { form, updateField, submit } = useLoginForm();
 	const [ error, setError ] = createSignal("");
 	var loggingIn = false;
@@ -108,22 +110,47 @@ function LoginForms() {
 		})
 	}
 
-	return ( <>
-		<div class="h-full w-full flex justify-center items-center">
-			<div class="loginFrame h-fit flex flex-col justify-center items-center">
-				<h1> Вход в систему </h1>
-				<form class="loginForm flex flex-col" onSubmit={onLoginSubmit}>
-					<input type="text" placeholder="Логин" onChange={updateField("login")} />
-					<input id="pwEntry" type="password" placeholder="Пароль" onChange={updateField("password")} />
+	return (
+		<Grid container
+					spacing={0}
+  				direction="column"
+  				alignItems="center"
+ 					justifyContent="center"
+					maxWidth="sm">
+			<Paper component={Stack} 
+						 direction="column" 
+						 justifyContent="center">
+				<Box component="form" onSubmit={onLoginSubmit} 
+						 alignItems="center"
+						 p={3}>
+					<Typography variant="h3"> 
+						Вход в систему 
+					</Typography>
+					<TextField margin="dense" 
+										 required
+										 fullWidth
+										 label="Логин"
+										 onChange={updateField("login")} />
+					<TextField margin="dense" 
+										 required
+										 fullWidth
+										 label="Пароль"
+										 id="pwEntry" 
+										 type="password" 
+										 onChange={updateField("password")} />
 
-					<input type="submit" value="Вход" name="login" class="mx-4" />
-				</form>
-				{ error() ? (<>
-					<p class="formError"> {error()} </p>
-				</>) : null}
-			</div>
-		</div>
-	</> )
+					<Button type="submit"
+									fullWidth
+									variant="contained"
+									color="primary">
+						Вход
+					</Button>
+					<Show when={error()}>
+						<Alert severity="error"> {error()} </Alert>
+					</Show>
+				</Box> 
+			</Paper>	
+		</Grid> )
 }
 
 export default LoginForms;
