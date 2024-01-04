@@ -16,51 +16,45 @@ async function fetchPrescription(id : number) : Promise<AxiosResponse<Prescripti
 
 const MedsView: Component<{meds: PrescriptionMedicine}> = (props) =>
 {
-	const periodText = periodToHumanText(props.meds.periodType, 
-																			 props.meds.period as string)
+	const periodText = periodToHumanText(props.meds.periodType, props.meds.period as string)
 
 	return <Grow in={true}>
-		<Card class="p-2 flex flex-col gap-y-1">
-			<CardContent>
-				<Typography variant="h5">
-					{props.meds.name}
-				</Typography>
-				<Typography variant="body1">
-					Дозировка: {props.meds.dose}
-				</Typography>
-				<Typography variant="body1">
-					Приём {periodText.digest}
-				</Typography>
-			</CardContent>
+		<Card class="px-4 py-2 flex flex-col">
+			<Typography variant="h5">
+				{props.meds.name}
+			</Typography>
+			<Typography variant="body1">
+				Дозировка: {props.meds.dose}
+			</Typography>
+			<Typography variant="body1">
+				Приём {periodText.digest}
+			</Typography>
 		</Card>
 	</Grow>
-}	
+}
 
-const MedsListView: Component<{meds: PrescriptionMedicine[]}> = (props) => 
+const MedsListView: Component<{meds: PrescriptionMedicine[]}> = (props) =>
   <div class="listCard flex flex-col gap-2 pt-2">
 		<For each={props.meds}>
 			{m => <MedsView meds={m}/>}
 		</For>
 	</div>
-	
+
 const MetricsView: Component<{metrics: PrescriptionMetric}> = (props) =>
-{	
-	const periodText = periodToHumanText(props.metrics.periodType, 
-																			 props.metrics.period as string)
+{
+	const periodText = periodToHumanText(props.metrics.periodType, props.metrics.period as string)
 
 	return <Grow in={true}>
-		<Card class="p-2 flex flex-col gap-y-1">
-			<CardContent>
-				<Typography variant="h5">
-					{props.metrics.name}
-				</Typography>
-				<Typography variant="body1">
-					Замеры {periodText.digest}
-				</Typography>
-			</CardContent>
+		<Card class="px-4 py-2 flex flex-col">
+			<Typography variant="h5">
+				{props.metrics.name}
+			</Typography>
+			<Typography variant="body1">
+				Замеры {periodText.digest}
+			</Typography>
 		</Card>
 	</Grow>
-}	
+}
 
 const MetricsListView: Component<{metrics: PrescriptionMetric[]}> = (props) => 
   <div class="listCard flex flex-col gap-2 pt-2">
@@ -84,8 +78,6 @@ export function ViewPrescriptionPage() {
 		if (!fetchRes.error && fetchRes()) {
 			setPresc(fetchRes()!.data);
 		}
-
-		console.log(prescription)
 	})
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">
@@ -99,24 +91,38 @@ export function ViewPrescriptionPage() {
 			</h2>
 
 			<Show when={prescription} fallback={<h4> [загрузка назначения...] </h4>}>	
-				<div class="flex flex-col md:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
-					<div class="prescriptionCard w-full">
-						<div class="flex w-full">
-							<h3>Лекарства</h3>
+				<div class="flex flex-row">
+					<div class="flex flex-col lg:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
+						<div class="prescriptionCard w-full">
+							<div class="flex w-full">
+								<h3>Лекарства</h3>
+							</div>
+
+							<MedsListView meds={prescription.meds!} />
 						</div>
 
-						<MedsListView meds={prescription.meds!} />
+						<Divider orientation="vertical"
+										class="hidden lg:block" />
+
+						<div class="prescriptionCard w-full">
+							<div class="flex w-full">
+								<h3>Метрики</h3>
+							</div>
+
+							<MetricsListView metrics={prescription.metrics!} />
+						</div>
 					</div>
 
-					<Divider orientation="vertical"
-					 				 class="hidden md:block" />
-			
-					<div class="prescriptionCard w-full">
-						<div class="flex w-full">
-							<h3>Метрики</h3>
-						</div>
+					<Divider orientation="vertical" />
 
-						<MetricsListView metrics={prescription.metrics!} />
+					<div class="flex flex-col lg:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
+						<div class="prescriptionCard w-full">
+							<div class="flex w-full">
+								<h3>Отчёты</h3>
+							</div>
+
+							blah
+						</div>
 					</div>
 				</div>
 			</Show>

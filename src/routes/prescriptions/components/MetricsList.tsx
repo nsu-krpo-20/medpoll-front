@@ -16,7 +16,7 @@ export function MetricsList(props: MetricsListProps) : JSX.Element {
 	const arr = [];
 
 	return (<>
-		<div class="flex flex-col gap-2 pt-2">
+		<div class="flex flex-col gap-2">
 			<For each={props.metrics()}>
 				{(mt, i) => {
 					const [name, setName] = createSignal(mt.name);
@@ -36,55 +36,55 @@ export function MetricsList(props: MetricsListProps) : JSX.Element {
 
 					return <Grow in={true}>
 						<Card class="listCard p-2 flex flex-col gap-y-1">
-						<div class="flex flex-row">
-							<TextField value={name()}
-								placeholder="Название метрики"
-								size="small"
-								required
-								fullWidth
-								variant="outlined"
-								error={!!nameError()}
-								helperText={nameError()}
-								inputProps={{sx: {pt: 0.5, pb: 0.5}}}
-								disabled={!editable}
-								onChange={(e, val) => {
-									setName(val);
-								}}
-							/>
+							<div class="flex flex-row">
+								<TextField value={name()}
+									placeholder="Название метрики"
+									size="small"
+									required
+									fullWidth
+									variant="outlined"
+									error={!!nameError()}
+									helperText={nameError()}
+									inputProps={{sx: {pt: 0.5, pb: 0.5}}}
+									disabled={!editable}
+									onChange={(e, val) => {
+										setName(val);
+									}}
+								/>
 
-							<Show when={props.removeMetric}>
-								<div class="flex items-center h-8">
-								<IconButton color="error"
-									onClick={() => props.removeMetric!(mt)}>
-									<Delete />
-								</IconButton>
-								</div>
-							</Show>
-						</div>
-
-						<div class="flex flex-row gap-x-1">
-							<span class="flex items-center h-8">Период: </span>
-
-							<div class="flex flex-col grow">
-								<Select
-									inputProps={{sx: {pl: 1.5}}}
-									value={periodType()}
-									onChange={(e) => setPeriodType(e.target.value)}
-									label="Период"
-									variant="standard"
-									class="grow"
-								>
-									<MenuItem value={PeriodType.N_TIMES_PER_DAY}> Х раз в день </MenuItem>
-									<MenuItem value={PeriodType.ONCE_PER_N_DAYS}> Раз в Х дней </MenuItem>
-									<MenuItem value={PeriodType.WEEK_SCHEDULE}> По дням недели </MenuItem>
-									<MenuItem value={PeriodType.CUSTOM}> Свой... </MenuItem>
-								</Select>
+								<Show when={props.removeMetric}>
+									<div class="flex items-center h-8">
+									<IconButton color="error"
+										onClick={() => props.removeMetric!(mt)}>
+										<Delete />
+									</IconButton>
+									</div>
+								</Show>
 							</div>
-						</div>
 
-						<Dynamic component={periodTypeToComponent[periodType() as PeriodType]}
-									period={period} setPeriod={setPeriod} />
-					</Card>
+							<div class="flex flex-row gap-x-1">
+								<span class="flex items-center h-8">Период: </span>
+
+								<div class="flex flex-col grow">
+									<Select
+										inputProps={{sx: {pl: 1.5}}}
+										value={periodType()}
+										onChange={(e) => setPeriodType(e.target.value)}
+										label="Период"
+										variant="standard"
+										class="grow"
+									>
+										<MenuItem value={PeriodType.N_TIMES_PER_DAY}> Х раз в день </MenuItem>
+										<MenuItem value={PeriodType.ONCE_PER_N_DAYS}> Раз в Х дней </MenuItem>
+										<MenuItem value={PeriodType.WEEK_SCHEDULE}> По дням недели </MenuItem>
+										<MenuItem value={PeriodType.CUSTOM}> Свой... </MenuItem>
+									</Select>
+								</div>
+							</div>
+
+							<Dynamic component={periodTypeToComponent[periodType() as PeriodType]}
+										period={period} setPeriod={setPeriod} />
+						</Card>
 					</Grow>
 				}}
 			</For>
