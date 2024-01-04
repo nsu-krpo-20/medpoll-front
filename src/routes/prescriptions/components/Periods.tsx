@@ -45,7 +45,7 @@ export function PeriodNPerDay(props : PeriodProps) : JSXElement {
 
 	createEffect(() => {
 		var newPeriod = times[amtTimes()].times();
-		setPeriod(newPeriod);
+		setPeriod(JSON.stringify(newPeriod));
 	})
 
 	return <div class="flex flex-col">
@@ -94,7 +94,7 @@ export function PeriodOncePerNDays(props : PeriodProps) : JSXElement {
 	const [time, setTime] = createSignal(clock24HToUnixTime("12:00"));
 
 	createEffect(() => {
-		setPeriod([amtDays(), time()]);
+		setPeriod(JSON.stringify([amtDays(), time()]));
 	})
 
 	const GREMMER = (days: number) : string[] => {

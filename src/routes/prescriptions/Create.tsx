@@ -26,8 +26,8 @@ export function CreatePrescriptionPage() {
 		let newMed : PrescriptionMedicine = {
 			name: "",
 			dose: "",
-			period: [],
-			periodType: 0,
+			period: "[]",
+			periodType: PeriodType.DEFAULT,
 		}
 
 		setMeds([...meds(), newMed])
@@ -43,7 +43,7 @@ export function CreatePrescriptionPage() {
 	const addNewMetric = () => {
 		let newMetric : PrescriptionMetric = {
 			name: "",
-			period: [],
+			period: "[]",
 			periodType: PeriodType.DEFAULT,
 		}
 

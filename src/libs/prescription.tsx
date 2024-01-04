@@ -1,12 +1,5 @@
 import { authedClient } from "./api";
 
-export interface PrescriptionMedicine {
-	name: string,
-	dose: string,
-	periodType: number,
-	period: string | number[],
-}
-
 export enum PeriodType {
 	N_TIMES_PER_DAY = 1,
 	ONCE_PER_N_DAYS = 2,
@@ -16,7 +9,14 @@ export enum PeriodType {
 	DEFAULT = N_TIMES_PER_DAY
 }
 
-export type PeriodValue = string | number[];
+export type PeriodValue = string;
+
+export interface PrescriptionMedicine {
+	name: string,
+	dose: string,
+	periodType: PeriodType,
+	period: PeriodValue,
+}
 
 export interface PrescriptionMetric {
 	name: string,
@@ -50,21 +50,10 @@ interface PrescriptionDto {
 }
 
 function prescriptionToDto(presc: Prescription | NewPrescription) {
-	var newMeds = presc.meds ? [...presc.meds] : [];
-	var newMetrics = presc.metrics ? [...presc.metrics] : [];
-
-	newMeds.forEach((v) => {
-		v.period = JSON.stringify(v.period);
-	})
-
-	newMetrics.forEach((v) => {
-		v.period = JSON.stringify(v.period);
-	})
-
 	var ret : PrescriptionDto = {
 		patientCardId: presc.patientCardId,
-		meds: newMeds,
-		metrics: newMetrics
+		meds: presc.meds,
+		metrics: presc.metrics
 	}
 
 	return ret;
