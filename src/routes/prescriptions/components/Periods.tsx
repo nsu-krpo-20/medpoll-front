@@ -1,5 +1,6 @@
-import { ToggleButtonGroup, ToggleButton, TextField } from "@suid/material";
-import { Accessor, Setter, JSXElement, createSignal, createEffect, For, Index } from "solid-js";
+import { Add } from "@suid/icons-material";
+import { ToggleButtonGroup, ToggleButton, TextField, Typography, IconButton } from "@suid/material";
+import { Accessor, Setter, JSXElement, createSignal, createEffect, For, Index, Show } from "solid-js";
 import { PeriodValue, PeriodType } from "src/libs/prescription";
 
 interface PeriodProps {
@@ -16,6 +17,11 @@ function clock24HToUnixTime(clk: string) : number { // "14:00" -> 50400
     return Number(hrs) * 3600 + Number(min) * 60;
 }
 
+interface TimeEntry {
+	times: Accessor<number[]>,
+	setTimes: Setter<number[]>,
+}
+
 export function PeriodNPerDay(props : PeriodProps) : JSXElement {
 	const {setPeriod} = props;
 
@@ -26,11 +32,6 @@ export function PeriodNPerDay(props : PeriodProps) : JSXElement {
 	]
 
 	const [amtTimes, setAmtTimes] = createSignal(0);
-
-	interface TimeEntry {
-		times: Accessor<number[]>,
-		setTimes: Setter<number[]>,
-	}
 
 	const times : TimeEntry[] = []
 
@@ -140,8 +141,133 @@ export function PeriodOncePerNDays(props : PeriodProps) : JSXElement {
 	</div>
 }
 
+// { mon: [28800, 75600], fri: [39600, 75600] }
+const Weekdays = [
+	["mon", "Пн", "Понедельник"],
+	["tue", "Вт", "Вторник"],
+	["wed", "Ср", "Среда"],
+	["thu", "Чт", "Четверг"],
+	["fri", "Пт", "Пятница"],
+	["sat", "Сб", "Суббота"],
+	["sun", "Вс", "Воскресенье"],
+]
+
+type DaysMap = {[key: string]: TimeEntry}
+
+function getNewTimeEntry() : TimeEntry {
+	const [times, setTimes] = createSignal<number[]>([clock24HToUnixTime("14:00")])
+
+	return {
+		times: times,
+		setTimes: setTimes
+	}
+}
+
+const DayTimesComponent = (tentry: TimeEntry) => {
+	const {times, setTimes} = tentry;
+
+	const addTime = () => {
+		setTimes([...times(), clock24HToUnixTime("14:00")])
+	}
+
+	return <div class="flex flex-row grow-1 shrink-0 basis-0">
+		{/* Our items change but indices don't;
+		    using For here will randomly unfocus the TextField when typing
+		*/}
+		<Index each={times()}>
+			{(itm, idx) => {
+				// @ts-expect-error: Cry more
+				return <TextField type="time"
+					value={unixTimeTo24H(itm())}
+					size="small"
+					class="flex w-fit shrink"
+					variant="outlined"
+					sx={{w: 6, flex: 1, px: 1, "min-width": "140px"}}
+					inputProps={{sx: {py: 0.4}}}
+					onChange={(e, v) => {
+						var newArr = [...times()]
+						newArr[idx] = clock24HToUnixTime(v);
+						setTimes(newArr)
+					}}
+				/>
+			}}
+		</Index>
+		<IconButton sx={{py: 0}} onClick={addTime}>
+			<Add />
+		</IconButton>
+	</div>
+}
+
 export function PeriodWeekSchedule(props : PeriodProps) : JSXElement {
-	// TODO
+	const [days, setDays] = createSignal<DaysMap>({}); // Object of signals, not values!
+	const daysSave: DaysMap = {};
+
+	createEffect(() => {
+		// imma be real, i thought this effect wouldn't run when times would change
+		// (ie a single day's time was added or modified)
+		// but it does??? i don't even know why... fuck yeah i guess lol
+		const periodValue: any = {}
+		const daysVal = days()
+
+		for (var key in daysVal) {
+			periodValue[key] = daysVal[key].times()
+		}
+
+		props.setPeriod(JSON.stringify(periodValue))
+	})
+
+	return <div class="flex flex-col">
+		<ToggleButtonGroup class="flex grow justify-center h-12 px-4 py-2"
+			value={Object.keys(days())}
+			onChange={(e, v: string[]) => {
+				// The value passed are all currently checked days
+				// So we only copy entries that are present there into the `newDays` map
+				var oldDays: DaysMap = days();
+				var newDays: DaysMap = {};
+
+				v.forEach(element => {
+					newDays[element] = oldDays[element]
+						?? daysSave[element]
+						?? getNewTimeEntry();
+
+					daysSave[element] = newDays[element]
+				});
+
+				setDays(newDays)
+			}}>
+			<For each={Weekdays}>
+				{(itm, idx) => {
+					return <ToggleButton value={itm[0]} sx={{flex: 1}}>
+						{itm[1]}
+					</ToggleButton>
+				}}
+			</For>
+		</ToggleButtonGroup>
+
+		{/* Iterate the `Weekdays` array and not the `days` object to keep weekday order
+			Y gap spread equally as flexbox gap and bottom-padding on elements to add
+			a nice padding for the horizontal scroll when it appears
+		*/}
+		<div class="flex flex-col gap-y-1">
+			<For each={Weekdays}>
+				{(itm, idx) => {
+					return <Show when={days()[itm[0]]}>
+						<div class="flex flex-row overflow-x-auto grow pb-1">
+							<div class="min-w-[116px]">
+								{/* sorry Typography, you suck */}
+								<span class="text-lg">
+									{itm[2]}
+								</span>
+							</div>
+							<div class="w-0 grow">
+								{ DayTimesComponent(days()[itm[0]]) }
+							</div>
+						</div>
+					</Show>
+				}}
+			</For>
+		</div>
+	</div>
 }
 
 export function PeriodCustom(props : PeriodProps) : JSXElement {

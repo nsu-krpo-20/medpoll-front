@@ -11,6 +11,8 @@ export enum PeriodType {
 
 export type PeriodValue = string;
 
+export type WeekPeriodValue = {[weekKey: string]: number[]};
+
 export interface PrescriptionMedicine {
 	name: string,
 	dose: string,
@@ -96,6 +98,16 @@ function GREMMER(days: number) : string[] {
 	return ["Каждые", "дней"]
 }
 
+const Weekdays : {[key: string]: string} = {
+	["mon"]: "по понедельникам",
+	["tue"]: "по вторникам",
+	["wed"]: "по средам",
+	["thu"]: "по четвергам",
+	["fri"]: "по пятницам",
+	["sat"]: "по субботам",
+	["sun"]: "по воскресеньям",
+}
+
 export function periodToHumanText(type: PeriodType, val: string) : PeriodText {
 	var ret : PeriodText = {};
 
@@ -114,6 +126,17 @@ export function periodToHumanText(type: PeriodType, val: string) : PeriodText {
 			ret.details = null;
 			return ret;
 
+		case PeriodType.WEEK_SCHEDULE:
+			var weekDat : WeekPeriodValue = JSON.parse(val);
+			ret.type = "По дням недели";
+			ret.digest = Object.keys(weekDat)
+				.map(v => Weekdays[v] + ": "
+					+ weekDat[v].map(num => "в " + toHHMM(num)).join(", ")
+			).join(" // ")
+				
+			ret.details = null;
+			return ret;
+	
 		case PeriodType.CUSTOM:
 			ret.type = "Свой период";
 			ret.digest = val;

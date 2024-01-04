@@ -92,7 +92,7 @@ export function ViewPrescriptionPage() {
 
 			<Show when={prescription} fallback={<h4> [загрузка назначения...] </h4>}>	
 				<div class="flex flex-row">
-					<div class="flex flex-col lg:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
+					<div class="flex flex-col basis-[67%] lg:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
 						<div class="prescriptionCard w-full">
 							<div class="flex w-full">
 								<h3>Лекарства</h3>
@@ -115,7 +115,7 @@ export function ViewPrescriptionPage() {
 
 					<Divider orientation="vertical" />
 
-					<div class="flex flex-col lg:flex-row grow justify-around gap-x-3 gap-y-2 pt-4">
+					<div class="flex flex-col lg:flex-row grow basis-[33%] justify-around gap-x-3 gap-y-2 pt-4">
 						<div class="prescriptionCard w-full">
 							<div class="flex w-full">
 								<h3>Отчёты</h3>
