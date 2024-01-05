@@ -3,7 +3,7 @@ import { AxiosResponse } from 'axios';
 import { Component, Show, createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import * as Constants from "src/consts";
-import { authedClient } from "src/libs/api";
+import { authedClient, unauthedClient } from "src/libs/api";
 import { setToken } from 'src/libs/jwt';
 import './LoginForms.css';
 import { Alert, Box, Button, Grid, Paper, Stack, TextField, Typography } from '@suid/material';
@@ -22,7 +22,7 @@ function translateErr(err: any) {
 
 async function submit(form: LoginFormFields, endpoint: string) {
 	return new Promise<AxiosResponse>((res, rej) => {
-		authedClient.post(endpoint, {
+		unauthedClient.post(endpoint, {
 			login: form.login,
 			password: form.password,
 			email: form.email,
@@ -142,7 +142,8 @@ const LoginForms: Component<{}> = () =>
 					<Button type="submit"
 									fullWidth
 									variant="contained"
-									color="primary">
+									color="primary"
+									onClick={onLoginSubmit}>
 						Вход
 					</Button>
 					<Show when={error()}>
