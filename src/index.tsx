@@ -15,7 +15,6 @@ import { ViewPatientPage } from './routes/patients/View';
 import { createTheme, ThemeProvider } from '@suid/material';
 import { CreatePrescriptionPage } from './routes/prescriptions/Create';
 import { ViewPrescriptionPage } from './routes/prescriptions/View';
-import SearchPage from './routes/Search';
 import ViewReportPage from './routes/ReportPage';
 
 const root = document.getElementById('root')
@@ -69,7 +68,6 @@ render(() => {
 			<Route path="/" component={Main} />
 			<Route path="/login" component={AuthPage} />
 			<Route path="/patients" component={PatientsPage} />
-			<Route path="/patients/search" component={SearchPage} />
 			<Route path="/patients/view/:id" component={ViewPatientPage} />
 			<Route path="/patients/createPrescription/:id" component={CreatePrescriptionPage} />
 			<Route path="/prescription/:id" component={ViewPrescriptionPage} />

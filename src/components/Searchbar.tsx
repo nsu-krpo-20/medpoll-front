@@ -1,16 +1,32 @@
 import { Component, JSX, createSignal } from "solid-js"
 import { useNavigate } from "@solidjs/router"
 
-const Searchbar: Component = () => {
+type SearchbarProps = {
+	onSearch: ((qry: string) => void) | undefined,
+	onChange: ((qry: string) => void) | undefined,
+}
+
+const Searchbar: Component<SearchbarProps> = (props) => {
 	const [query, setQuery] = createSignal<string | undefined>(undefined);
+
 	const handleInput: JSX.EventHandlerUnion<HTMLInputElement, InputEvent> = (e) => {
 		const inputElement = e.currentTarget as HTMLInputElement;
-  	setQuery(inputElement.value == "" ? undefined : inputElement.value);
-	};
-	const navigate = useNavigate();
-	const gotoSearch = () => navigate(`/patients/search?q=${query()}`);
+  		setQuery(inputElement.value == "" ? undefined : inputElement.value);
 
-	return <form onSubmit={gotoSearch}>   
+		if (props.onChange) {
+			props.onChange(query() ?? "");
+		}
+	};
+
+	const doSearch = (e: Event) => {
+		e.preventDefault();
+
+		if (props.onSearch && query()) {
+			props.onSearch(query()!);
+		}
+	}
+
+	return <form onSubmit={doSearch}>
   	<label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Поиск</label>
   	<div class="relative">
       	<div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -23,4 +39,4 @@ const Searchbar: Component = () => {
   	</div>
 	</form>
 }
-export default Searchbar; 
+export default Searchbar;

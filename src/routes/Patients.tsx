@@ -87,6 +87,7 @@ export default function PatientsPage() {
 	const [isNewPatient, setIsNewPatient] = createSignal(false);
 	const [cards, setCards] = createSignal([] as Cards.PatientCard[]);
 	const [cardCount, setCardCount] = createSignal(0);
+	const [query, setQuery] = createSignal<string | undefined>("");
 
 	/* <TotallyNotAHack> */
 	var currentOpts = {
@@ -102,7 +103,7 @@ export default function PatientsPage() {
 		setPageOpts({...currentOpts})
 	})
 
-	const [pgProps, page, ] = createPagination(pageOpts);
+	const [pgProps, page, setPage] = createPagination(pageOpts);
 	/* </TotallyNotAHack> */
 
 	const closeNewPatient = () => setIsNewPatient(false);
@@ -112,12 +113,25 @@ export default function PatientsPage() {
 
 	const fetchCards = (page?: number) => Cards.fetchMultiple(
 										(page ? (page - 1) : 0) * cardsPerPage, 
-										cardsPerPage)
+										cardsPerPage, query())
 
 	Cards.fetchCount().then(setCardCount);
 	const fetchCurrentPage = () => fetchCards(page()).then((data) => setCards(data));
 	const onNewCard = () =>	fetchCurrentPage();
-	createEffect(fetchCurrentPage);
+	createEffect(fetchCurrentPage, [page, query]);
+
+	const doSearch = (q: string) => {
+		setPage(0);
+		setQuery(q);
+	}
+
+	const searchChanged = (q: string) => {
+		// If the search query gets cleared, clear the search results as well
+		if (q.length == 0) {
+			setPage(0);
+			setQuery(undefined);
+		}
+	}
 
 	return (
 		<div class="w-full h-screen flex flex-col grow overflow-y-scroll">
@@ -128,19 +142,19 @@ export default function PatientsPage() {
 			<div class="pageContent">
 				<div class="flex justify-between">
 					<h2 class="pb-4"> Список пациентов </h2>
-					<Searchbar/>
+					<Searchbar onSearch={doSearch} onChange={searchChanged}/>
 				</div>
 				<div class="pb-4">
 					<Button variant="contained" color="success" onClick={openNewPatient}>
 						<Add /> Создать
 					</Button>
 				</div>
-				
+
 				<PatientsGrid pgProps={pgProps}
 											cards={cards}/>
-				
-				<NewPatientModal isOpen={isNewPatient()} 
-												 closeModal={closeNewPatient} 
+
+				<NewPatientModal isOpen={isNewPatient()}
+												 closeModal={closeNewPatient}
 												 onSubmit={onNewCard}/>
 			</div>
 		</div>
