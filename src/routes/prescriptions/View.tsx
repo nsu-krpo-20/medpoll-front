@@ -1,5 +1,6 @@
 import { useLocation, useNavigate, useParams } from "@solidjs/router";
-import { Card, CardContent, Divider, Grow, List, ListItem, ListItemButton, Typography } from "@suid/material";
+import { Archive, DeleteForever, DeleteSweep, FolderDeleteSharp, Remove } from "@suid/icons-material";
+import { Button, Card, CardContent, Divider, Grow, List, ListItem, ListItemButton, Typography } from "@suid/material";
 import { AxiosResponse } from "axios";
 import { Component, For, Show, createEffect, createResource, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -108,6 +109,7 @@ export function ViewPrescriptionPage() {
 	const params = useParams();
 	const id = Number(params.id);
 
+	const [isActive, setActive] = createSignal<boolean>(true);
 	const [prescription, setPresc] = createSignal<Prescription>(useLocation().state as Prescription)
 	// prescription might be null, so be on the lookout for that
 	
@@ -117,8 +119,16 @@ export function ViewPrescriptionPage() {
 		// https://github.com/solidjs/solid/discussions/1888#discussioncomment-7060132
 		if (!fetchRes.error && fetchRes()) {
 			setPresc(fetchRes()!.data);
+			setActive(prescription().isActive)
 		}
 	})
+
+	const archivePrescription = () => {
+		setActive(false)
+		authedClient.post(`/api/v1/prescriptions/makeInactive?id=${id}`).catch(() => {
+			setActive(prescription().isActive); // on error, restore state
+		});
+	}
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">
 		<div class="w-full h-12">
@@ -126,9 +136,16 @@ export function ViewPrescriptionPage() {
 		</div>
 
 		<div class="pageContent">
-			<h2 class="-mb-3"> { /* cancel out the gap; the alternative is yet another flexbox */ }
-				Просмотр назначения
-			</h2>
+			<div class="flex flex-row gap-x-4">
+				<h2>
+					Просмотр назначения
+				</h2>
+				<Button variant="contained" color="error" onClick={archivePrescription}
+					disabled={!prescription() || !isActive()}>
+					<Archive class="mr-1" />
+					Сделать неактивным
+				</Button>
+			</div>
 
 			<Show when={prescription()} fallback={<h4> [загрузка назначения...] </h4>}>	
 				<div class="flex flex-row">

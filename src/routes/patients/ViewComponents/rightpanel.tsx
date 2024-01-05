@@ -84,7 +84,14 @@ export function ViewPrescriptions(props : any) : JSX.Element {
 					return <ListItem disablePadding class="flex">
 						<ListItemButton class="prescriptionListBtn flex flex-col" sx={{alignItems: "flex-start"}}
 							onClick={(e) => gotoPrescription(p)}>
-							<h3>Назначение</h3>
+							<h3 class={"flex flex-row items-center " + (p.isActive ? "" : "opacity-50 italic")}>
+								Назначение
+								<Show when={!p.isActive}>
+									<span class="ml-2 text-lg">
+										(неактивно)
+									</span>
+								</Show>
+							</h3>
 							<span class="createdTime">
 								Создано: {createdDate.toLocaleDateString("ru-RU")} {createdDate.toLocaleTimeString("ru-RU", {hour: "numeric", minute: "numeric"})}
 							</span>
