@@ -1,14 +1,7 @@
 import { Card, CardContent, CardHeader, Typography } from "@suid/material";
-import { Component, For } from "solid-js";
-import { Prescription } from "src/libs/prescription";
+import { Component, For, Show, createEffect, createSignal } from "solid-js";
+import { Prescription, PrescriptionMedicine } from "src/libs/prescription";
 import { Report } from 'src/libs/report';
-
-function showTime(time: number|null): string {
-	if (time === null)
-		return ""
-	else 
-		return new Date(time).toString()
-}
 
 function filterArray(arr: any[], criteria: boolean[]) {
 	return arr.map((e, i) => [e, criteria[i]])
@@ -16,36 +9,86 @@ function filterArray(arr: any[], criteria: boolean[]) {
 						.map(el=> el[0])
 }
 
-const ReportView: Component<{report: Report, prescription: Prescription}> = (props) =>
+interface ReportViewProps {
+	report: Report | undefined,
+	prescription: Prescription | undefined
+}
+
+const ReportView: Component<ReportViewProps> = (props) =>
 {
-	const medsTaken = props.prescription.meds !== null && props.report.medsTaken !== null ?
-										filterArray(props.prescription.meds, props.report.medsTaken) : null
-	return <Card>
-		<CardHeader title={"Отчет № " + props.report.id} 
-								subheader={showTime(props.report.time)}/>
+	type medStatus = { med: PrescriptionMedicine, taken: boolean }
+	const [medsTaken, setMedsTaken] = createSignal<medStatus[]>([], { equals: false });
+
+	console.log("ReportView:", props.prescription, props.report)
+
+	createEffect(() => {
+		if (props.prescription && props.report) {
+			const newArr: medStatus[] = [];
+
+			props.prescription.meds!.forEach((med, i) => {
+				newArr.push({
+					med: med,
+					taken: !!(props.report!.medsTaken[i])
+				})
+			})
+
+			setMedsTaken(newArr);
+		}
+	})
+
+	return <Card class="m-4">
+		<CardHeader title={"Отчет"}
+				subheader={props.report
+					? ("Сформирован: " + new Date(props.report.time!).toLocaleString("ru-RU"))
+					: "загрузка..."}/>
+
 		<CardContent>
 			<Typography variant="h5">
-				Принятые препараты	
+				Принятые препараты
 			</Typography>
-			<For each={medsTaken}>{med =>
-				<Typography variant="body2">
-					{med.name + " " + med.dose}
-				</Typography>}
-			</For>
-			<Typography variant="h5">
+			
+			<div class="px-2">
+				<For each={medsTaken()}>
+					{(status) =>
+					<Typography variant="body1">
+						<span class="font-bold">
+							{status.med.name}
+						</span>
+						{" (" + status.med.dose + "): "}
+						<span class={status.taken ? "text-green-800" : "text-red-800"}>
+							{status.taken ? "Принято" : "Не принято"}
+						</span>
+					</Typography>}
+				</For>
+			</div>
+
+			<Typography variant="h5" class="pt-4">
 				Метрики	
 			</Typography>
-			<For each={props.report.metrics}>{metric =>
-				<Typography variant="body2">
-					{metric}
-				</Typography>}
-			</For>
-			<Typography variant="h5">
-				Отзыв	
-			</Typography>
-			<Typography variant="body1">
-				{props.report.feedback}	
-			</Typography>
+			
+			<div class="px-2">
+				<Show when={props.report}>
+					<For each={props.report!.metrics}>
+						{(metric, i) =>
+						<Typography variant="body1">
+							<span class="font-bold">
+								{props.prescription?.metrics![i()].name + ": "}
+							</span>
+
+							{metric}
+						</Typography>}
+					</For>
+				</Show>
+			</div>
+
+			<Show when={props.report?.feedback}>
+				<Typography variant="h5" class="pt-4">
+					Отзыв	
+				</Typography>
+				<Typography variant="body1">
+					{props.report!.feedback}	
+				</Typography>
+			</Show>
 
 		</CardContent>
 	</Card>

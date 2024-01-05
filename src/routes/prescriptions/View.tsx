@@ -84,8 +84,6 @@ export function ViewPrescriptionPage() {
 		if (!fetchRes.error && fetchRes()) {
 			setPresc(fetchRes()!.data);
 		}
-
-		console.log(prescription)
 	})
 
 	return <div class="w-full h-screen flex flex-col grow overflow-y-scroll">

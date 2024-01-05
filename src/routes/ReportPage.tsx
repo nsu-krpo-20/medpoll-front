@@ -1,6 +1,6 @@
 import { useParams } from "@solidjs/router";
 import { AxiosResponse } from "axios";
-import { Component, createResource, createEffect } from "solid-js";
+import { Component, createResource, createEffect, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 import ReportView from "src/components/ReportView";
 import TopBar from "src/components/TopBar";
@@ -8,29 +8,40 @@ import { authedClient } from "src/libs/api";
 import { Report } from 'src/libs/report';
 import { Prescription} from 'src/libs/prescription';
 
-async function fetchRes(id : number) : Promise<AxiosResponse<Report, any>> {
+
+
+async function fetchReport(id : number) : Promise<AxiosResponse<Report, any>> {
 	// Invalid ID passed in route; don't try fetching anything
 	if (isNaN(id)) return new Promise((rej) => rej);
 
 	return authedClient.get(`/api/v1/reports/${id}`);
 }
 
+async function fetchPrescription(report : Report) : Promise<AxiosResponse<Prescription, any>> {
+	return authedClient.get(`/api/v1/prescriptions/${report.prescriptionId}`);
+}
+
 const ViewReportPage: Component<{}> = () =>
 {
 	const params = useParams();
 	const id = Number(params.id);
-	const [report, setReport] = createStore<Report>({} as Report)
-	const [prescription, setPresc] = createStore<Prescription>({} as Prescription)
+	const [report, setReport] = createSignal<Report>()
+	const [prescription, setPresc] = createSignal<Prescription>()
 
-	const [fetchReport] = createResource(id, fetchRes);
+	// We fetch the prescription using the prescriptionID from the report.
+	// That means we need to fetch the report first (so we use it as a signal)
+	const [reportRes] = createResource(id, fetchReport);
+	const [prescRes] = createResource(report, fetchPrescription);
+
 	createEffect(() => {
 		// https://github.com/solidjs/solid/discussions/1888#discussioncomment-7060132
-		if (!fetchReport.error && fetchReport()) {
-			setReport(fetchReport()!.data);
+		if (!reportRes.error && reportRes()) {
+			setReport(reportRes()!.data);
 		}
-		const prescriptionId = report.prescriptionId
-		authedClient.get('/api/v1/prescriptions/' + prescriptionId)
-			.then(r => setPresc(r.data))
+
+		if (!prescRes.error && prescRes()) {
+			setPresc(prescRes()!.data);
+		}
 	})
 
 	let dummyReport: Report = {
@@ -48,8 +59,7 @@ const ViewReportPage: Component<{}> = () =>
 			<TopBar />
 		</div>
 
-		<ReportView report={dummyReport}
-								prescription={prescription}/>	
+		<ReportView prescription={prescription()} report={report()} />
 	</div>
 }
 
