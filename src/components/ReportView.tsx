@@ -19,8 +19,6 @@ const ReportView: Component<ReportViewProps> = (props) =>
 	type medStatus = { med: PrescriptionMedicine, taken: boolean }
 	const [medsTaken, setMedsTaken] = createSignal<medStatus[]>([], { equals: false });
 
-	console.log("ReportView:", props.prescription, props.report)
-
 	createEffect(() => {
 		if (props.prescription && props.report) {
 			const newArr: medStatus[] = [];
@@ -46,7 +44,7 @@ const ReportView: Component<ReportViewProps> = (props) =>
 			<Typography variant="h5">
 				Принятые препараты
 			</Typography>
-			
+
 			<div class="px-2">
 				<For each={medsTaken()}>
 					{(status) =>
@@ -63,9 +61,9 @@ const ReportView: Component<ReportViewProps> = (props) =>
 			</div>
 
 			<Typography variant="h5" class="pt-4">
-				Метрики	
+				Метрики
 			</Typography>
-			
+
 			<div class="px-2">
 				<Show when={props.report}>
 					<For each={props.report!.metrics}>
@@ -83,10 +81,10 @@ const ReportView: Component<ReportViewProps> = (props) =>
 
 			<Show when={props.report?.feedback}>
 				<Typography variant="h5" class="pt-4">
-					Отзыв	
+					Отзыв пациента
 				</Typography>
 				<Typography variant="body1">
-					{props.report!.feedback}	
+					{props.report!.feedback}
 				</Typography>
 			</Show>
 

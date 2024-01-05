@@ -43,7 +43,7 @@ export function ViewPairing(props : any) : JSX.Element {
 
 
 		<Show when={token()} fallback={loadingToken()}>
-			<QRCodeView data={Constants.API_URL + token()} />
+			<QRCodeView data={Constants.QRAPI_URL + token()} />
 		</Show>
 	</div>
 }
