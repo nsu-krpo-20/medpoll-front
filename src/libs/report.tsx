@@ -2,7 +2,7 @@
 export interface ReportOverview {
 	id: number,
 	prescriptionId: number,
-	time: number|null
+	time: number
 }
 
 // Complete report returned when fetching a single report. Contains all the information
